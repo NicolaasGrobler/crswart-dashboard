@@ -26,6 +26,7 @@
 
         <b-button
           type="is-primary"
+          expanded
           style="margin-top: 10px"
           >Login</b-button
         >
