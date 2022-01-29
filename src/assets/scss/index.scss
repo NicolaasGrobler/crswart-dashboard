@@ -1,11 +1,21 @@
 // Import Bulma's core
-@import "~bulma/sass/utilities/_all";
+@import "../../../node_modules/bulma/sass/utilities/_all.sass";
 
 // Set your colors
 $primary: #B89C6A;
 $primary-light: findLightColor($primary);
 $primary-dark: findDarkColor($primary);
 $primary-invert: findColorInvert($primary);
+
+$success: #4BB543;
+$success-light: findLightColor($success);
+$success-dark: findDarkColor($success);
+$success-invert: findColorInvert($success);
+
+$danger: #640B26;
+$danger-light: findLightColor($danger);
+$danger-dark: findDarkColor($danger);
+$danger-invert: findColorInvert($danger);
 
 // Lists and maps
 $custom-colors: null !default;
@@ -62,9 +72,9 @@ $colors: mergeColorMaps(
         ),
         "danger": (
             $danger,
-            $danger-invert,
             $danger-light,
             $danger-dark,
+            $danger-invert,
         ),
     ),
     $custom-colors
@@ -76,5 +86,5 @@ $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 // Import Bulma and Buefy styles
-@import "~bulma";
+@import "../../../node_modules/bulma/bulma.sass";
 @import "~buefy/src/scss/buefy";

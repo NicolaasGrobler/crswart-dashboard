@@ -10,7 +10,14 @@ const routes = [
   {
     path: '/',
     name: 'Dashboard',
-    component: Dashboard
+    component: Dashboard,
+    beforeEnter: (to, from, next) => {
+      if (localStorage.getItem("token")) {
+        next();    
+      } else {
+        next("/login");
+      }
+    },
   },
   {
     path: '/login',
