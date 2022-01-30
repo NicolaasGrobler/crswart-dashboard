@@ -14,15 +14,15 @@ export default {
 </script>
 
 <style lang="scss">
-html {
-  overflow: hidden !important;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
+// html {
+//   overflow: hidden !important;
+//   scrollbar-width: none;
+//   -ms-overflow-style: none;
+// }
 
-html::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
+// html::-webkit-scrollbar {
+//   width: 0;
+//   height: 0;
+// }
 </style>
 
