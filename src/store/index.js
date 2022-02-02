@@ -9,12 +9,14 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   // Define state
   state: {
-    count: 0,
+    user: {
+      roles: [],
+    },
   },
   // Define mutations
   mutations: {
-    increment(state) {
-      state.count++;
+    setUser(state, payload) {
+      state.user = payload;
     },
   },
 });

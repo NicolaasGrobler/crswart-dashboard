@@ -1,20 +1,29 @@
 <template>
   <div class="main-content-nav">
     <!-- Back Button -->
-    <b-icon icon="arrow-left" 
-        custom-size="mdi-24px" class="back nav-icon"> </b-icon>
+    <div @click="back" v-if="breadcrumbs.length > 1">
+      <b-icon icon="arrow-left" custom-size="mdi-24px" class="back nav-icon">
+      </b-icon>
+    </div>
     <!-- Breadcrumbs -->
-    <b-breadcrumb separator="has-succeeds-separator" style="font-size: 15px !important;">
-      <b-breadcrumb-item href="/">Home</b-breadcrumb-item>
-      <b-breadcrumb-item href="/documentation">Docs</b-breadcrumb-item>
-      <b-breadcrumb-item href="/documentation/breadcrumb" active
-        >Breadcrumb</b-breadcrumb-item
+    <b-breadcrumb
+      separator="has-succeeds-separator"
+      style="font-size: 15px !important;"
+    >
+      <b-breadcrumb-item
+        style="font-weight: bold !important"
+        tag="router-link"
+        :to="breadcrumb.path"
+        v-for="(breadcrumb, index) in breadcrumbs"
+        :key="index"
+        :active="breadcrumb.active"
+        >{{ breadcrumb.name }}</b-breadcrumb-item
       >
     </b-breadcrumb>
 
     <div class="right-side">
       <!-- Welcome Text -->
-      <p style="margin-right: 10px"> {{user.name}} </p>
+      <p style="margin-right: 10px">{{ $store.state.user.name }} {{$store.state.user.surname}}</p>
       <!-- Notifications -->
       <b-icon
         icon="bell-outline"
@@ -23,7 +32,13 @@
       >
       </b-icon>
       <!-- Avatar -->
-      <img src="https://thispersondoesnotexist.com/image" alt="Avatar" width="35px" class="avatar">
+      <img
+        src="https://thispersondoesnotexist.com/image"
+        alt="Avatar"
+        width="35px"
+        class="avatar"
+        @click="$router.push('/my-account')"
+      />
     </div>
   </div>
 </template>
@@ -31,9 +46,36 @@
 <script>
 export default {
   name: "ContentMain",
-  props: {
-    user: {
-      name: "",
+  data() {
+    return {
+      breadcrumbs: [],
+    };
+  },
+  watch: {
+    // call again the method if the route changes
+    $route: "createBreacrumbs",
+  },
+  created() {
+    this.createBreacrumbs();
+  },
+  methods: {
+    back() {
+      if (this.breadcrumbs.length > 1) {
+        this.$router.push({
+          path: this.breadcrumbs[this.breadcrumbs.length - 2].path,
+        });
+      }
+    },
+    createBreacrumbs() {
+      // Create breadcrumbs from matched routes
+      this.breadcrumbs = this.$route.matched.map((route) => {
+        return {
+          name: route.name,
+          path: route.path || "/",
+        };
+      });
+
+      this.breadcrumbs[this.breadcrumbs.length - 1].active = true;
     },
   },
 };
@@ -42,6 +84,7 @@ export default {
 <style lang="scss" scoped>
 .main-content-nav {
   width: 100%;
+  min-height: 60px;
   height: 60px;
   display: flex;
   align-items: center;

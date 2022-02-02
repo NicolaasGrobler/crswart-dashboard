@@ -2,94 +2,33 @@
   <section class="my-dashboard">
     <div class="sidebar-container">
       <div class="my-sidebar">
+        <!-- Emblem -->
+        <img src="../assets/img/emblem.png" alt="Emblem" width="50" />
         <!-- App Title -->
         <h1 class="app-title">CR Swart</h1>
-        <!-- Search Bar -->
-          <b-field>
-            <b-input placeholder="Search..." type="search" icon="magnify">
-            </b-input>
-          </b-field>
       </div>
 
       <!-- App Menu -->
-        <div class="app-menu">
-          <!-- Links -->
-          <b-menu>
-            <b-menu-list label="Menu">
-              <b-menu-item
-                icon="view-dashboard"
-                label="Dashboard"
-                :active="isActive"
-              ></b-menu-item>
-              <b-menu-item icon="shield-crown">
-                <template #label="props">
-                  Administrator
-                  <b-icon
-                    class="is-pulled-right"
-                    :icon="props.expanded ? 'menu-up' : 'menu-down'"
-                  ></b-icon>
-                </template>
-                <b-menu-item icon="account" label="Users"></b-menu-item>
-                <b-menu-item icon="cellphone-link">
-                  <template #label>
-                    Devices
-                    <b-dropdown
-                      aria-role="list"
-                      class="is-pulled-right"
-                      position="is-bottom-left"
-                    >
-                      <template #trigger>
-                        <b-icon icon="dots-vertical"></b-icon>
-                      </template>
-                      <b-dropdown-item aria-role="listitem"
-                        >Action</b-dropdown-item
-                      >
-                      <b-dropdown-item aria-role="listitem"
-                        >Another action</b-dropdown-item
-                      >
-                      <b-dropdown-item aria-role="listitem"
-                        >Something else</b-dropdown-item
-                      >
-                    </b-dropdown>
-                  </template>
-                </b-menu-item>
-                <b-menu-item
-                  icon="cash-multiple"
-                  label="Payments"
-                  disabled
-                ></b-menu-item>
-              </b-menu-item>
-              <b-menu-item icon="account" label="My Account">
-                <b-menu-item label="Account data"></b-menu-item>
-                <b-menu-item label="Addresses"></b-menu-item>
-              </b-menu-item>
-            </b-menu-list>
-            <b-menu-list>
-              <b-menu-item
-                label="Expo"
-                icon="link"
-                tag="router-link"
-                target="_blank"
-                to="/expo"
-              ></b-menu-item>
-            </b-menu-list>
-          </b-menu>
-        </div>
+      <AppMenu></AppMenu>
 
       <!-- Logout -->
-        <div class="logout-container">
-          <b-button
-            class="logout-button"
-            icon="logout"
-            type="is-danger"
-            expanded
-            @click="logout"
-            >Logout</b-button
-          >
-        </div>
+      <div class="logout-container">
+        <b-button
+          class="logout-button"
+          icon="logout"
+          type="is-danger"
+          expanded
+          outlined
+          @click="logout"
+          >Logout</b-button
+        >
+      </div>
     </div>
     <div class="my-content">
-      <ContentMain :user="user"></ContentMain>
+      <ContentMain></ContentMain>
+      <div class="content">
+        <router-view></router-view>
+      </div>
     </div>
   </section>
 </template>
@@ -97,18 +36,17 @@
 <script>
 import axios from "axios";
 import ContentMain from "../components/ContentMain.vue";
+import AppMenu from "../components/AppMenu.vue";
 
 export default {
   name: "Dashboard",
   title: "CR Swart Dashboard",
   components: {
-    ContentMain: ContentMain,
+    ContentMain,
+    AppMenu,
   },
   data() {
     return {
-      user: {
-        name: "",
-      },
       is_loading: false,
       isActive: true,
     };
@@ -117,7 +55,7 @@ export default {
     axios
       .get("auth/user")
       .then((response) => {
-        this.user = response.data.user;
+        this.$store.commit("setUser", response.data.user);
       })
       .catch((error) => {
         if (error.response.data.error.name == "TokenExpiredError") {
@@ -170,6 +108,7 @@ export default {
   display: flex;
   flex-direction: row;
   height: 100vh;
+  width: 100vw;
 }
 
 .sidebar-container {
@@ -186,7 +125,6 @@ export default {
 .my-sidebar {
   padding: 20px;
   display: flex;
-  flex-direction: column;
   border-bottom: 1px solid rgb(235, 235, 235);
 }
 
@@ -201,14 +139,24 @@ export default {
 }
 
 .my-content {
-  flex: 2;
+  flex: 1;
   min-width: 700px;
-  overflow-x: scroll !important;
+  width: 100%;
+  /* overflow-x: scroll !important; */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
 }
 
 .app-title {
+  margin-left: 30px;
   font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 20px;
 }
 </style>

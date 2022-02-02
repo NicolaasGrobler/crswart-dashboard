@@ -1,40 +1,67 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Dashboard from '../views/Dashboard.vue';
-import Login from '../views/Login.vue';
-import Register from '../views/Register.vue';
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Dashboard from "../views/Dashboard.vue";
+import Login from "../views/Login.vue";
+import Register from "../views/Register.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'Dashboard',
+    path: "/",
+    name: "Dashboard",
     component: Dashboard,
     beforeEnter: (to, from, next) => {
       if (localStorage.getItem("token")) {
-        next();    
+        next();
       } else {
         next("/login");
       }
     },
+    children: [
+      {
+        path: "/my-account",
+        name: "My Account",
+        component: () => import("../views/MyAccount.vue"),
+      },
+      {
+        path: "/admin/subjects",
+        name: "Subjects",
+        component: () => import("../views/admin/Subjects.vue"),
+      },
+      {
+        path: "/admin/users",
+        name: "Users",
+        component: () => import("../views/admin/Users.vue"),
+      },
+      {
+        path: "/lessons/create",
+        name: "Create Lesson",
+        component: () => import("../views/lessons/Create.vue"),
+      },
+      {
+        path: "/lessons/view",
+        name: "View Lesson",
+        component: () => import("../views/lessons/View.vue"),
+      }
+    ],
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
+    path: "/login",
+    name: "Login",
+    component: Login,
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: Register
+    path: "/register",
+    name: "Register",
+    component: Register,
   },
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;

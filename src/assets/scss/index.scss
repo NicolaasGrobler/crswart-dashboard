@@ -3,7 +3,7 @@
 
 // Set your colors
 $primary: #B89C6A;
-$primary-light: findLightColor($primary);
+$primary-light: #ddba7fc7;
 $primary-dark: findDarkColor($primary);
 $primary-invert: findColorInvert($primary);
 
@@ -16,6 +16,12 @@ $danger: #640B26;
 $danger-light: findLightColor($danger);
 $danger-dark: findDarkColor($danger);
 $danger-invert: findColorInvert($danger);
+
+$editor: #F5F5F5;
+$editor-invert: #2547df;
+$editor-light: #494949;
+$editor-dark: #af1919;
+$editor-active: #af1919;
 
 // Lists and maps
 $custom-colors: null !default;
@@ -75,6 +81,13 @@ $colors: mergeColorMaps(
             $danger-light,
             $danger-dark,
             $danger-invert,
+        ),
+        "editor": (
+            $editor,
+            $editor-light,
+            $editor-dark,
+            $editor-invert,
+            $editor-active,
         ),
     ),
     $custom-colors
