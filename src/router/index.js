@@ -43,6 +43,11 @@ const routes = [
         path: "/lessons/view",
         name: "View Lesson",
         component: () => import("../views/lessons/View.vue"),
+      },
+      {
+        path: "/lessons/:uuid",
+        name: "Lesson View",
+        component: () => import("../views/lessons/LessonView.vue"),
       }
     ],
   },

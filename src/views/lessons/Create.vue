@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <div class="tile is-vertical box">
+    <div class="tile is-vertical box" v-if="!lesson_created">
       <h1>Create Lesson</h1>
       <b-field label="Author">
         <b-input
@@ -92,6 +92,23 @@
         >Create Lesson</b-button
       >
     </div>
+
+    <div class="tile is-vertical box" v-else>
+      <h1>Lesson Created</h1>
+      <b-button
+        expanded
+        type="is-primary"
+        @click="goToLesson"
+        style="margin-bottom: 20px"
+        outlined
+        tag="router-link"
+        :to="`/lessons/${new_lesson_uuid}`"
+        >Go to Lesson</b-button
+      >
+      <b-button expanded type="is-primary" @click="reset">
+        Create a new lesson
+      </b-button>
+    </div>
   </section>
 </template>
 
@@ -112,6 +129,8 @@ export default {
       subject_loading: false,
       description: null,
       files: [],
+      lesson_created: false,
+      new_lesson_uuid: null,
     };
   },
   methods: {
@@ -128,8 +147,6 @@ export default {
       this.subject_disabled = false;
     },
     async createLesson() {
-      //TODO: Create lesson
-
       if (this.files.length === 0) {
         this.$buefy.toast.open({
           duration: 2000,
@@ -154,7 +171,6 @@ export default {
       // Loop through each file
       for (let i = 0; i < this.files.length; i++) {
         // Get signed s3 url for file upload
-        //TODO: Pass in the file type to the getSignedS3Url method to add extension to the url so that files can be downloaded properly if they are an abnormal extension
         let { url } = await axios
           // TODO: Change the url to the correct to a secure one
           .post("s3URL", {
@@ -225,6 +241,9 @@ export default {
             this.subject = null;
             this.description = null;
             this.files = [];
+
+            this.lesson_created = true;
+            this.new_lesson_uuid = response.data.lesson.uuid;
           });
       }
     },
@@ -241,6 +260,13 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    reset() {
+      this.grade = null;
+      this.subject = null;
+      this.description = null;
+      this.files = [];
+      this.lesson_created = false;
     },
   },
 };
