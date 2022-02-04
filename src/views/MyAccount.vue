@@ -23,32 +23,34 @@
           <b-field>
             <b-input
               placeholder="Email"
-              :value="$store.state.user.email"
+              :value="email"
               type="email"
               readonly
               icon="email"
             >
             </b-input>
           </b-field>
-          <b-field grouped style="margin-bottom: 20px;">
+          <b-field grouped style="margin-bottom: 20px">
             <!-- Title -->
             <b-field label="Title">
-              <b-input
-                placeholder="Title"
-                :value="$store.state.user.title"
-                readonly
-                icon="email"
+              <b-select
+                placeholder="Select a title"
+                expanded
+                :disabled="is_modal_create_loading"
+                v-model="title"
               >
-              </b-input>
+                <option
+                  v-for="(title, index) in $store.state.titles"
+                  :value="title.title"
+                  :key="index"
+                >
+                  {{ title.title }}
+                </option>
+              </b-select>
             </b-field>
             <!-- User Surname -->
             <b-field label="surname" expanded>
-              <b-input
-                placeholder="Surname"
-                :value="$store.state.user.surname"
-                readonly
-                icon="email"
-              >
+              <b-input placeholder="Surname" v-model="surname">
               </b-input>
             </b-field>
           </b-field>
@@ -60,6 +62,7 @@
               icon="key"
               label="Save Changes"
               style="margin-right: 10px"
+              @click="saveChanges"
             ></b-button>
             <b-button
               type="is-danger"
@@ -74,11 +77,55 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "MyAccount",
   title: "CR Swart Account",
   data() {
-    return {};
+    return {
+      title: "",
+      surname: "",
+      email: "",
+    };
+  },
+  async mounted() {
+    axios.get('auth/profile').then(response => {
+      this.title = response.data.user.title;
+      this.surname = response.data.user.surname;
+      this.email = response.data.user.email;
+    }).catch(error => {
+      //TOOD: toast error
+      console.log(error);
+    });
+  },
+  methods: {
+    saveChanges() {
+      axios
+        .put("auth/teacher/user", {
+          title: this.title,
+          surname: this.surname,
+        })
+        .then((response) => {
+          this.$buefy.toast.open({
+            duration: 2000,
+            message: response.data.title,
+            type: "is-success",
+          });
+
+          this.$store.commit("updateProfile", {
+            title: this.title,
+            surname: this.surname,
+          });
+        })
+        .catch((error) => {
+          this.$buefy.toast.open({
+            duration: 2000,
+            message: error.response.data.title,
+            type: "is-danger",
+          });
+        });
+    },
   },
 };
 </script>

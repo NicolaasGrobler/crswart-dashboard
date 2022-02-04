@@ -24,5 +24,11 @@ export default new Vuex.Store({
     setUser(state, payload) {
       state.user = payload;
     },
+    updateProfile(state, payload) {
+      state.user = {
+        ...state.user,
+        payload
+      }
+    }
   },
 });
