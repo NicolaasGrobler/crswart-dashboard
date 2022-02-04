@@ -142,8 +142,6 @@ export default {
   flex: 1;
   min-width: 700px;
   width: 100%;
-  /* overflow-x: scroll !important; */
-
   display: flex;
   flex-direction: column;
 }
@@ -152,6 +150,7 @@ export default {
   flex: 1;
   padding: 20px;
   overflow: auto;
+  overflow-y: scroll;
 }
 
 .app-title {

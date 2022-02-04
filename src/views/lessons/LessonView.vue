@@ -41,6 +41,7 @@
               expanded
               icon-left="download"
               class="button is-primary"
+              style="margin-bottom: 10px;"
             >
               {{ file.file_name.split(".")[0] }}
             </b-button>

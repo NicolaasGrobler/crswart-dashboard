@@ -37,6 +37,13 @@
             to="/lessons"
             :active="$route.path === '/lessons'"
           ></b-menu-item>
+          <b-menu-item
+            icon="book-account"
+            label="My Lessons"
+            tag="router-link"
+            to="/lessons/mine"
+            :active="$route.path === '/lessons/mine'"
+          ></b-menu-item>
         </b-menu-item>
         <!-- Administrator -->
         <b-menu-item
