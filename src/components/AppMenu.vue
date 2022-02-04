@@ -12,7 +12,7 @@
           :active="$route.path === '/'"
         ></b-menu-item>
         <!-- Lessons -->
-        <b-menu-item icon="book" :active="$route.path.match(/(\/lessons\/)/g) ? true : false">
+        <b-menu-item icon="book" :active="$route.path.match(/(\/lessons)/g) ? true : false">
           <template #label="props">
             Lessons
             <b-icon
@@ -22,6 +22,7 @@
           </template>
           <!-- Create Lesson -->
           <b-menu-item
+            v-if="$store.state.user.roles.includes('admin') || $store.state.user.roles.includes('teacher')"
             icon="book-plus"
             label="Create Lesson"
             tag="router-link"
@@ -31,10 +32,10 @@
           <!-- View Lessons -->
           <b-menu-item
             icon="book-education"
-            label="View Lesson"
+            label="View Lessons"
             tag="router-link"
-            to="/lessons/view"
-            :active="$route.path === '/lessons/view'"
+            to="/lessons"
+            :active="$route.path === '/lessons'"
           ></b-menu-item>
         </b-menu-item>
         <!-- Administrator -->

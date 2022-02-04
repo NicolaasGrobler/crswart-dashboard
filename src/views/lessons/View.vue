@@ -21,7 +21,7 @@
 <script>
 import axios from "axios";
 export default {
-  name: "View Lessons",
+  name: "Lessons",
   title: "CR Swart Lessons",
   data() {
     return {

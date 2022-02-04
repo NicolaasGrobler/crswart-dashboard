@@ -8,7 +8,7 @@
     <!-- Breadcrumbs -->
     <b-breadcrumb
       separator="has-succeeds-separator"
-      style="font-size: 15px !important;"
+      style="font-size: 15px !important"
     >
       <b-breadcrumb-item
         style="font-weight: bold !important"
@@ -23,7 +23,9 @@
 
     <div class="right-side">
       <!-- Welcome Text -->
-      <p style="margin-right: 10px">{{ $store.state.user.name }} {{$store.state.user.surname}}</p>
+      <p style="margin-right: 10px">
+        {{ $store.state.user.name }} {{ $store.state.user.surname }}
+      </p>
       <!-- Notifications -->
       <b-icon
         icon="bell-outline"
@@ -67,13 +69,33 @@ export default {
       }
     },
     createBreacrumbs() {
-      // Create breadcrumbs from matched routes
-      this.breadcrumbs = this.$route.matched.map((route) => {
-        return {
-          name: route.name,
-          path: route.path || "/",
-        };
-      });
+      if (this.$route.params.uuid) {
+        this.breadcrumbs = [
+          {
+            name: "Dashboard",
+            path: "/",
+            active: false,
+          },
+          {
+            name: "Lessons",
+            path: "/lessons",
+            active: false,
+          },
+          {
+            name: this.$route.params.uuid,
+            path: `/lessons/${this.$route.params.uuid}`,
+            active: true,
+          },
+        ];
+      } else {
+        // Create breadcrumbs from matched routes
+        this.breadcrumbs = this.$route.matched.map((route) => {
+          return {
+            name: route.name,
+            path: route.path || "/",
+          };
+        });
+      }
 
       this.breadcrumbs[this.breadcrumbs.length - 1].active = true;
     },

@@ -30,9 +30,21 @@
         Delete Subject
       </b-button>
     </div>
-    <div class="tile is-ancestor box">
+    <div class="tile is-vertical is-ancestor box">
+      <b-field>
+        <b-input placeholder="Search..." type="search" icon="magnify" v-model="search_term">
+        </b-input>
+        <p class="control">
+          <b-button type="is-primary" label="Search" />
+        </p>
+      </b-field>
+
       <b-table
-        :data="data"
+        :data="
+          data.filter((subject) =>
+            subject.name.toLowerCase().includes(search_term.toLowerCase())
+          )
+        "
         style="width: 100%"
         striped
         checkable
@@ -293,6 +305,7 @@ export default {
       is_edit_modal_active: false,
       is_modal_edit_loading: false,
       is_edit_modal_disabled: true,
+      search_term: "",
       new_subject: {
         name: "",
         grade_8: false,
@@ -375,6 +388,14 @@ export default {
           duration: 2000,
           type: "is-success",
         });
+      }).catch((error) => {
+        console.log(error);
+        this.is_modal_create_loading = false;
+        this.$buefy.toast.open({
+          message: "Error creating subject",
+          duration: 2000,
+          type: "is-danger",
+        });
       });
     },
     openEditModal() {
@@ -443,7 +464,8 @@ export default {
                 type: "is-success",
               });
               this.checked_rows = [];
-            }).catch((error) => {
+            })
+            .catch((error) => {
               this.$buefy.toast.open({
                 message: error.response.data.title,
                 duration: 2000,
@@ -454,21 +476,24 @@ export default {
       });
     },
     saveSubjects() {
-      axios.put('auth/subjects', {
-        subjects: this.data
-      }).then((response) => {
-        this.$buefy.toast.open({
-          message: response.data.title,
-          duration: 2000,
-          type: "is-success",
+      axios
+        .put("auth/subjects", {
+          subjects: this.data,
+        })
+        .then((response) => {
+          this.$buefy.toast.open({
+            message: response.data.title,
+            duration: 2000,
+            type: "is-success",
+          });
+        })
+        .catch((error) => {
+          this.$buefy.toast.open({
+            message: error.response.data.title,
+            duration: 2000,
+            type: "is-danger",
+          });
         });
-      }).catch((error) => {
-        this.$buefy.toast.open({
-          message: error.response.data.title,
-          duration: 2000,
-          type: "is-danger",
-        });
-      });
     },
     getSubjects() {
       axios

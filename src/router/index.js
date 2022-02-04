@@ -40,8 +40,8 @@ const routes = [
         component: () => import("../views/lessons/Create.vue"),
       },
       {
-        path: "/lessons/view",
-        name: "View Lesson",
+        path: "/lessons",
+        name: "Lessons",
         component: () => import("../views/lessons/View.vue"),
       },
       {

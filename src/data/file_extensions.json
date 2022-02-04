@@ -1,0 +1,134 @@
+[
+    {
+        "extension": ".aif"
+    },
+    {
+        "extension": ".cda"
+    },
+    {
+        "extension": ".mid"
+    },
+    {
+        "extension": ".midi"
+    },
+    {
+        "extension": ".mp3"
+    },
+    {
+        "extension": ".mpa"
+    },
+    {
+        "extension": ".ogg"
+    },
+    {
+        "extension": ".wav"
+    },
+    {
+        "extension": ".wma"
+    },
+    {
+        "extension": ".wpl"
+    },
+
+    {
+        "extension": ".7z"
+    },
+    {
+        "extension": ".arj"
+    },
+    {
+        "extension": ".rar"
+    },
+    {
+        "extension": ".tar.gz"
+    },
+    {
+        "extension": ".zip"
+    },
+    
+    {
+        "extension": ".csv"
+    },
+    {
+        "extension": ".mdb"
+    },
+    {
+        "extension": ".sql"
+    },
+    {
+        "extension": ".xml"
+    },
+    {
+        "extension": ".tar"
+    },
+
+    {
+        "extension": ".jpeg"
+    },
+    {
+        "extension": ".jpg"
+    },
+    {
+        "extension": ".png"
+    },
+
+
+    {
+        "extension": ".ods"
+    },
+    {
+        "extension": ".xls"
+    },
+    {
+        "extension": ".xlsm"
+    },
+    {
+        "extension": ".xlsx"
+    },
+
+
+    {
+        "extension": ".avi"
+    },
+    {
+        "extension": ".flv"
+    },
+    {
+        "extension": ".m4v"
+    },
+    {
+        "extension": ".mkv"
+    },
+    {
+        "extension": ".mov"
+    },
+    {
+        "extension": ".mp4"
+    },
+    {
+        "extension": ".mpg"
+    },
+    {
+        "extension": ".mpeg"
+    },
+
+
+    {
+        "extension": ".doc"
+    },
+    {
+        "extension": ".odt"
+    },
+    {
+        "extension": ".pdf"
+    },
+    {
+        "extension": ".rtf"
+    },
+    {
+        "extension": ".txt"
+    },
+    {
+        "extension": ".wpd"
+    }
+]

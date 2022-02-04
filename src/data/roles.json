@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Admin",
+        "value": "admin"
+    },
+    {
+        "name": "Teacher",
+        "value": "teacher"
+    },
+    {
+        "name": "Student",
+        "value": "student"
+    }
+]
