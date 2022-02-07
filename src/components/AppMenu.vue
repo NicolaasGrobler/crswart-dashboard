@@ -12,7 +12,10 @@
           :active="$route.path === '/'"
         ></b-menu-item>
         <!-- Lessons -->
-        <b-menu-item icon="book" :active="$route.path.match(/(\/lessons)/g) ? true : false">
+        <b-menu-item
+          icon="book"
+          :active="$route.path.match(/(\/lessons)/g) ? true : false"
+        >
           <template #label="props">
             Lessons
             <b-icon
@@ -22,7 +25,10 @@
           </template>
           <!-- Create Lesson -->
           <b-menu-item
-            v-if="$store.state.user.roles.includes('admin') || $store.state.user.roles.includes('teacher')"
+            v-if="
+              $store.state.user.roles.includes('admin') ||
+              $store.state.user.roles.includes('teacher')
+            "
             icon="book-plus"
             label="Create Lesson"
             tag="router-link"
@@ -38,11 +44,23 @@
             :active="$route.path === '/lessons'"
           ></b-menu-item>
           <b-menu-item
+            v-if="
+              $store.state.user.roles.includes('admin') ||
+              $store.state.user.roles.includes('teacher')
+            "
             icon="book-account"
             label="My Lessons"
             tag="router-link"
             to="/lessons/mine"
             :active="$route.path === '/lessons/mine'"
+          ></b-menu-item>
+          <b-menu-item
+          v-if="$store.state.user.roles.includes('student')"
+            icon="book-account"
+            label="For Me"
+            tag="router-link"
+            to="/lessons/for-me"
+            :active="$route.path === '/lessons/for-me'"
           ></b-menu-item>
         </b-menu-item>
         <!-- Administrator -->
@@ -103,7 +121,7 @@ export default {
   name: "AppMenu",
   data() {
     return {};
-  }
+  },
 };
 </script>
 

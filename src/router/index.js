@@ -50,10 +50,15 @@ const routes = [
         component: () => import("../views/lessons/MyLessons.vue"),
       },
       {
+        path: "/lessons/for-me",
+        name: "For Me",
+        component: () => import("../views/lessons/ForMe.vue"),
+      },
+      {
         path: "/lessons/:uuid",
         name: "Lesson View",
         component: () => import("../views/lessons/LessonView.vue"),
-      }
+      },
     ],
   },
   {
