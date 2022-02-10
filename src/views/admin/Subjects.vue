@@ -370,7 +370,7 @@ export default {
     },
     createSubject() {
       // Create the new subject
-      axios.post("/auth/subject", this.new_subject).then((response) => {
+      axios.post("/subjects/create", this.new_subject).then((response) => {
         console.log(response);
         this.is_modal_create_loading = false;
         this.is_create_modal_active = false;
@@ -415,7 +415,7 @@ export default {
     editSubject() {
       // Update the subject
       axios
-        .put("auth/subject", {
+        .put("subjects/update", {
           id: this.checked_rows[0].id,
           ...this.new_subject,
         })
@@ -451,7 +451,7 @@ export default {
         hasIcon: true,
         onConfirm: async () => {
           axios
-            .delete("auth/subject", {
+            .delete("subjects/delete", {
               data: {
                 subjects: this.checked_rows,
               },
@@ -477,7 +477,7 @@ export default {
     },
     saveSubjects() {
       axios
-        .put("auth/subjects", {
+        .put("/subjects/update/multiple", {
           subjects: this.data,
         })
         .then((response) => {
@@ -497,7 +497,7 @@ export default {
     },
     getSubjects() {
       axios
-        .get("auth/subjects")
+        .get("subjects")
         .then((response) => {
           this.data = response.data.subjects;
         })

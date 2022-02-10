@@ -50,8 +50,7 @@
             </b-field>
             <!-- User Surname -->
             <b-field label="surname" expanded>
-              <b-input placeholder="Surname" v-model="surname">
-              </b-input>
+              <b-input placeholder="Surname" v-model="surname"> </b-input>
             </b-field>
           </b-field>
           <!-- Password Reset button -->
@@ -89,20 +88,13 @@ export default {
       email: "",
     };
   },
-  async mounted() {
-    axios.get('auth/profile').then(response => {
-      this.title = response.data.user.title;
-      this.surname = response.data.user.surname;
-      this.email = response.data.user.email;
-    }).catch(error => {
-      //TOOD: toast error
-      console.log(error);
-    });
+  mounted() {
+    this.getProfile();
   },
   methods: {
     saveChanges() {
       axios
-        .put("auth/teacher/user", {
+        .put("auth/profile", {
           title: this.title,
           surname: this.surname,
         })
@@ -117,6 +109,22 @@ export default {
             title: this.title,
             surname: this.surname,
           });
+        })
+        .catch((error) => {
+          this.$buefy.toast.open({
+            duration: 2000,
+            message: error.response.data.title,
+            type: "is-danger",
+          });
+        });
+    },
+    getProfile() {
+      axios
+        .get("auth/current")
+        .then((response) => {
+          this.title = response.data.user.title;
+          this.surname = response.data.user.surname;
+          this.email = response.data.user.email;
         })
         .catch((error) => {
           this.$buefy.toast.open({

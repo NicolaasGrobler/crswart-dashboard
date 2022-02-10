@@ -173,7 +173,7 @@ export default {
         // Get signed s3 url for file upload
         let { url } = await axios
           // TODO: Change the url to the correct to a secure one
-          .post("s3URL", {
+          .post("/lessons/s3URL", {
             file_name: this.files[i].name,
             file_type: this.files[i].type,
             file_extension: this.files[i].name.split(".").pop(),
@@ -221,7 +221,7 @@ export default {
         });
       } else {
         axios
-          .post("/auth/lesson", {
+          .post("/lessons/create", {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
             date: new Date(),
             grade: this.grade,
@@ -252,7 +252,7 @@ export default {
     },
     getSubjects() {
       axios
-        .get(`auth/subjects/${this.grade}`)
+        .get(`subjects/grade/${this.grade}`)
         .then((response) => {
           console.log(response.data);
           this.subjects = response.data.subjects;

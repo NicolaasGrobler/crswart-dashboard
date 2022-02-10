@@ -52,27 +52,7 @@ export default {
     };
   },
   mounted() {
-    axios
-      .get("auth/user")
-      .then((response) => {
-        this.$store.commit("setUser", response.data.user);
-      })
-      .catch((error) => {
-        if (error.response.data.error.name == "TokenExpiredError") {
-          alert("Token Expired");
-        } else if (
-          error.response.data.error.name == "refreshTokenExpiredError"
-        ) {
-          alert("Refresh Token has expired");
-          this.$router.push("/login");
-        } else {
-          alert("Token Invalid, please sign in again");
-          //Delete token from local storage
-          localStorage.removeItem("token");
-          //Log User Out
-          this.$router.push("/login");
-        }
-      });
+    this.getUserData();
   },
   methods: {
     async logout() {
@@ -98,6 +78,21 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       this.$router.push("/login");
+    },
+    getUserData() {
+      axios
+        .get("auth/current")
+        .then((response) => {
+          this.$store.commit("setUser", response.data.user);
+        })
+        .catch(() => {
+          this.$router.push("/login");
+          this.$buefy.toast.open({
+            duration: 2000,
+            message: `Unauthorized`,
+            type: "is-danger",
+          });
+        });
     },
   },
 };

@@ -65,7 +65,7 @@ export default {
   },
   mounted() {
     axios
-      .get(`/auth/lesson/${this.$route.params.uuid}`)
+      .get(`/lessons/${this.$route.params.uuid}`)
       .then((response) => {
         this.lesson = response.data.lesson;
       })

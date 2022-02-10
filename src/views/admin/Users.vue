@@ -331,21 +331,13 @@ export default {
         .then((response) => {
           this.data = response.data.users;
         })
-        .catch((error) => {
-          if (error.response.data.error.name == "TokenExpiredError") {
-            alert("Token Expired");
-          } else if (
-            error.response.data.error.name == "refreshTokenExpiredError"
-          ) {
-            alert("Refresh Token has expired");
-            this.$router.push("/login");
-          } else {
-            alert("Token Invalid, please sign in again");
-            //Delete token from local storage
-            localStorage.removeItem("token");
-            //Log User Out
-            this.$router.push("/login");
-          }
+        .catch(() => {
+          this.$router.push("/login");
+          this.$buefy.toast.open({
+            duration: 2000,
+            message: `Unauthorized`,
+            type: "is-danger",
+          });
         });
     },
     getUserData(uuid) {
@@ -389,8 +381,8 @@ export default {
       // Open Modal
       this.is_create_modal_active = true;
     },
-    async openEditModal(user_id) {
-      await this.getUserData(user_id);
+    openEditModal(user_id) {
+      this.getUserData(user_id);
 
       // Open Modal
       this.is_edit_modal_active = true;
@@ -411,8 +403,6 @@ export default {
       this.is_edit_modal_active = false;
     },
     async createUser() {
-      // TODO: Validate user data
-
       this.is_modal_create_loading = true;
 
       let upload_restrictions = this.user.upload_restrictions;
@@ -483,10 +473,8 @@ export default {
         upload_restrictions,
       };
 
-      console.log(user);
-
       axios
-        .put("auth/user", user)
+        .put(`auth/user/${this.user.uuid}`, user)
         .then((response) => {
           this.$buefy.toast.open({
             message: response.data.title,
@@ -517,11 +505,7 @@ export default {
         onConfirm: async () => {
           // Delete user
           await axios
-            .delete("auth/user", {
-              data: {
-                uuid,
-              },
-            })
+            .delete(`auth/user/${uuid}`)
             .then((response) => {
               this.$buefy.toast.open({
                 message: response.data.title,

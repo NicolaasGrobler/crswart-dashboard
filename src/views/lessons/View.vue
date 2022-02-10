@@ -34,7 +34,7 @@ export default {
   methods: {
     async getLessons() {
       axios
-        .get("auth/lessons")
+        .get("lessons")
         .then((response) => {
           this.lessons = response.data.lessons;
         })

@@ -176,9 +176,9 @@ export default {
   },
   methods: {
     async getLessons() {
-      // Get all lessons
+      // Get all lessons created by current user
       await axios
-        .get(`auth/lessons/user`)
+        .get(`lessons/author/current`)
         .then((response) => {
           this.lessons = response.data.lessons;
         })
@@ -212,26 +212,37 @@ export default {
       };
     },
     deleteLesson() {
-      axios
-        .delete(`auth/lesson/${this.lesson.uuid}`)
-        .then(async (response) => {
-          await this.getLessons();
-          this.closeLessonModal();
+      this.$buefy.dialog.confirm({
+        title: "Deleting lesson",
+        message:
+          "Are you sure you want to <b>delete</b> this lesson? This action cannot be undone.",
+        confirmText: "Delete Lesson",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: async () => {
+          // Delete user
+          axios
+            .delete(`lessons/${this.lesson.uuid}/delete`)
+            .then(async (response) => {
+              await this.getLessons();
+              this.closeLessonModal();
 
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: response.data.title,
-            type: "is-success",
-          });
-        })
-        .catch((error) => {
-          // Error Toast
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: error.response.data.title,
-            type: "is-danger",
-          });
-        });
+              this.$buefy.toast.open({
+                duration: 2000,
+                message: response.data.title,
+                type: "is-success",
+              });
+            })
+            .catch((error) => {
+              // Error Toast
+              this.$buefy.toast.open({
+                duration: 2000,
+                message: error.response.data.title,
+                type: "is-danger",
+              });
+            });
+        },
+      });
     },
   },
 };
