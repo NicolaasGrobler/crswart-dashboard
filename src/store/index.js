@@ -1,6 +1,7 @@
 // Import dependencies
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import titles from "../data/titles.json";
 import roles from "../data/roles.json";
 import file_extensions from "../data/file_extensions.json";
@@ -31,4 +32,6 @@ export default new Vuex.Store({
       }
     }
   },
+  // Define plugins
+  plugins: [createPersistedState()],
 });

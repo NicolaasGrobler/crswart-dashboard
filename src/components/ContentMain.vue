@@ -62,11 +62,12 @@ export default {
   },
   methods: {
     back() {
-      if (this.breadcrumbs.length > 1) {
-        this.$router.push({
-          path: this.breadcrumbs[this.breadcrumbs.length - 2].path,
-        });
-      }
+      // if (this.breadcrumbs.length > 1) {
+      //   this.$router.push({
+      //     path: this.breadcrumbs[this.breadcrumbs.length - 2].path,
+      //   });
+      // }
+      this.$router.back();
     },
     createBreacrumbs() {
       if (this.$route.params.uuid) {

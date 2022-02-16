@@ -1,21 +1,17 @@
 <template>
   <section class="container">
-    <div class="tile box">
-      <b-field
-        label="Subject Filter"
-        message="Leave blank to show lessons from all subjects"
-        expanded
+    <div class="tile box" style="padding: 10px;">
+      <b-checkbox-button
+        v-model="subjectFilter"
+        v-for="(item, index) in subjects"
+        :key="index"
+        :native-value="item.name"
+        style="margin: 5px;"
       >
-        <b-checkbox-button
-          v-model="subjectFilter"
-          :native-value="subject.name"
-          v-for="(subject, index) in subjects"
-          :key="index"
-        >
-          {{ subject.name }}
-        </b-checkbox-button>
-      </b-field>
+        {{ item.name }}
+      </b-checkbox-button>
     </div>
+
     <div class="tile is-vertical box">
       <h3>Latest Grade {{ this.$store.state.user.grade }} Lessons</h3>
 
@@ -37,6 +33,7 @@
           justify-content: space-between;
           align-items: center;
         "
+        @click="openLesson(lesson.uuid)"
       >
         Grade {{ lesson.grade }} - {{ lesson.subject }}
         <p style="display: flex; align-items: center">
@@ -60,8 +57,6 @@
         <h4>No lessons found</h4>
       </div>
     </div>
-
-    {{ this.$store.state.user.grade }}
   </section>
 </template>
 
@@ -87,17 +82,16 @@ export default {
       subjectFilter: [],
     };
   },
-  created() {
-    this.getLessons();
-    this.getSubjects();
+  computed: {
+    userGrade() {
+      return this.$store.state.user.grade;
+    },
   },
   methods: {
     getLessons() {
-      console.log("User", this.$store.state.user);
-
       // Get all lessons created by current user
       axios
-        .get(`/lessons/grade/${this.$store.state.user.grade}`)
+        .get(`/lessons/grade/${this.userGrade}`)
         .then((response) => {
           console.log("Lessons", response.data.lessons);
           this.lessons = response.data.lessons;
@@ -107,10 +101,8 @@ export default {
         });
     },
     getSubjects() {
-      console.log("User", this.$store.state.user);
-
       axios
-        .get(`subjects/grade/${this.$store.state.user.grade}`)
+        .get(`subjects/grade/${this.userGrade}`)
         .then((response) => {
           console.log("Subjects", response.data);
           this.subjects = response.data.subjects;
@@ -119,6 +111,19 @@ export default {
           console.log(error);
         });
     },
+    openLesson(uuid) {
+      // Change route to view lesson
+      this.$router.push({
+        name: "Lesson View",
+        params: {
+          uuid: uuid,
+        },
+      });
+    }
+  },
+  async mounted() {
+    await this.getLessons();
+    await this.getSubjects();
   },
 };
 </script>

@@ -9,8 +9,8 @@
           <h3 class="date grade">
             {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
           </h3>
-          <h3 class="date grade" style="margin-left: 10px !important; background: #640B26;">
-            Updated {{ lesson.updated_on != '0000-00-00 00:00:00' ? new Date(lesson.updated_on).toLocaleDateString("en-GB") : '' }}
+          <h3 class="date grade" style="margin-left: 10px !important; background: #640B26;" v-if="new Date(lesson.updated_on).toLocaleDateString('en-GB') != '01/01/1970'">
+            Updated {{ new Date(lesson.updated_on).toLocaleDateString("en-GB")}}
           </h3>
         </div>
       </div>
