@@ -141,7 +141,10 @@
               </option>
             </b-select>
           </b-field>
-          <b-field label="File Upload Restrictions" v-if="display_restrictions">
+          <b-field
+            label="File Upload Restrictions"
+            v-show="display_restrictions"
+          >
             <b-taginput
               v-model="user.upload_restrictions"
               :data="filteredExtensions"
@@ -153,6 +156,17 @@
               @typing="getFilteredExtensions"
             >
             </b-taginput>
+          </b-field>
+          <b-field label="Student Grade" v-show="display_grade">
+            <b-radio-button
+              v-model="user.grade"
+              v-for="grade in [8, 9, 10, 11, 12]"
+              :key="grade"
+              :native-value="grade"
+              type="is-primary"
+            >
+              <span>Grade {{ grade }}</span>
+            </b-radio-button>
           </b-field>
         </section>
         <footer class="modal-card-foot">
@@ -258,6 +272,17 @@
             >
             </b-taginput>
           </b-field>
+          <b-field label="Student Grade" v-show="display_grade">
+            <b-radio-button
+              v-model="user.grade"
+              v-for="grade in [8, 9, 10, 11, 12]"
+              :key="grade"
+              :native-value="grade"
+              type="is-primary"
+            >
+              <span>Grade {{ grade }}</span>
+            </b-radio-button>
+          </b-field>
         </section>
         <footer class="modal-card-foot">
           <b-button
@@ -291,6 +316,7 @@ export default {
         title: "",
         name: "",
         surname: "",
+        grade: "",
         email: "",
         roles: [],
         password: null,
@@ -311,6 +337,17 @@ export default {
           this.user.roles.includes("admin") ||
           this.user.roles.includes("teacher")
         ) {
+          return true;
+        } else {
+          return false;
+        }
+      } catch {
+        return false;
+      }
+    },
+    display_grade() {
+      try {
+        if (this.user.roles.includes("student")) {
           return true;
         } else {
           return false;
@@ -373,6 +410,7 @@ export default {
         name: "",
         surname: "",
         email: "",
+        grade: "",
         roles: [],
         password: null,
         upload_restrictions: [],

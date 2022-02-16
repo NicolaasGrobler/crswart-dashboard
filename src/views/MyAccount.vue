@@ -49,8 +49,12 @@
               </b-select>
             </b-field>
             <!-- User Surname -->
-            <b-field label="surname" expanded>
+            <b-field label="Surname" expanded>
               <b-input placeholder="Surname" v-model="surname"> </b-input>
+            </b-field>
+            <!-- Grade -->
+            <b-field label="Grade" v-if="grade != 0">
+              <b-input placeholder="Grade" v-model="grade"> </b-input>
             </b-field>
           </b-field>
           <!-- Password Reset button -->
@@ -125,6 +129,7 @@ export default {
           this.title = response.data.user.title;
           this.surname = response.data.user.surname;
           this.email = response.data.user.email;
+          this.grade = response.data.user.grade;
         })
         .catch((error) => {
           this.$buefy.toast.open({

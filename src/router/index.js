@@ -40,6 +40,11 @@ const routes = [
         component: () => import("../views/lessons/Create.vue"),
       },
       {
+        path: "/lessons/edit/:uuid",
+        name: "Edit Lesson",
+        component: () => import("../views/lessons/Edit.vue"),
+      },
+      {
         path: "/lessons",
         name: "Lessons",
         component: () => import("../views/lessons/View.vue"),

@@ -134,6 +134,7 @@
             type="is-primary"
             icon-left="pencil"
             :loading="is_lesson_modal_loading"
+            @click="editLesson(lesson.uuid)"
           />
           <b-button
             label="Delete Lesson"
@@ -241,6 +242,15 @@ export default {
                 type: "is-danger",
               });
             });
+        },
+      });
+    },
+    editLesson(uuid) {
+      // Redirect to edit lesson page
+      this.$router.push({
+        name: "Edit Lesson",
+        params: {
+          uuid: uuid,
         },
       });
     },

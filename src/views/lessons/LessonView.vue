@@ -9,6 +9,9 @@
           <h3 class="date grade">
             {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
           </h3>
+          <h3 class="date grade" style="margin-left: 10px !important; background: #640B26;">
+            Updated {{ lesson.updated_on != '0000-00-00 00:00:00' ? new Date(lesson.updated_on).toLocaleDateString("en-GB") : '' }}
+          </h3>
         </div>
       </div>
       <div style="display: flex; align-items: center; margin-top: 20px">
