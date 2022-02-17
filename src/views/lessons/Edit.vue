@@ -12,7 +12,7 @@
       <b-field label="Date">
         <b-input
           icon="calendar-range"
-          :value="`${new Date().toLocaleDateString('en-GB')}`"
+          :value="`${new Date(this.date).toLocaleDateString('en-GB')}`"
           readonly
         ></b-input>
       </b-field>
@@ -145,6 +145,7 @@ export default {
   title: "CR Swart Lesson Editor",
   data() {
     return {
+      date: "",
       grade: null,
       subject: null,
       subjects: [],
@@ -168,6 +169,7 @@ export default {
       this.grade = response.data.lesson.grade;
       this.getSubjects();
       this.subject = response.data.lesson.subject;
+      this.date = response.data.lesson.date;
       this.subject_disabled = false;
       this.description = response.data.lesson.description;
       this.uploadedFiles = JSON.parse(response.data.lesson.files);
@@ -263,7 +265,6 @@ export default {
         axios
           .post(`/lessons/edit/${this.$route.params.uuid}`, {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
-            date: new Date(),
             grade: this.grade,
             subject: this.subject,
             description: this.description,

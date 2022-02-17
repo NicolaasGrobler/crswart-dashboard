@@ -93,11 +93,24 @@
         "
       >
         Grade {{ lesson.grade }} - {{ lesson.subject }}
-        <p style="display: flex; align-items: center">
-          <b-icon icon="calendar" style="margin-right: 5px; color: #555">
-          </b-icon>
-          {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
-        </p>
+        <div style="display: flex;">
+          <p style="display: flex; align-items: center; margin-bottom: 0px; margin-right: 10px;">
+            <b-icon icon="calendar" style="margin-right: 5px; color: #555">
+            </b-icon>
+            {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
+          </p>
+          <p
+            class="date grade"
+            style="margin-left: 10px !important; background: #640b26"
+            v-if="
+              new Date(lesson.updated_on).toLocaleDateString('en-GB') !=
+              '01/01/1970'
+            "
+          >
+            Updated
+            {{ new Date(lesson.updated_on).toLocaleDateString("en-GB") }}
+          </p>
+        </div>
       </div>
 
       <div
@@ -317,12 +330,22 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .lesson_box {
   cursor: pointer;
 }
 
 .lesson_box:hover {
   background: #f5f5f5;
+}
+
+.date {
+  margin: 0px !important;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 10px;
 }
 </style>

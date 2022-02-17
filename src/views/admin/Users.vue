@@ -40,7 +40,7 @@
           field="controls"
           label="Controls"
           v-slot="props"
-          width="200"
+          width="300"
           centered
         >
           <b-button
@@ -57,6 +57,15 @@
             @click="deleteUser(props.row.uuid)"
             style="margin-left: 10px"
             >Delete</b-button
+          >
+          <b-button
+            icon-left="lock"
+            size="is-small"
+            class="is-danger"
+            outlined
+            @click="resetPassword(props.row.email, props.row.uuid)"
+            style="margin-left: 10px"
+            >Reset Password</b-button
           >
         </b-table-column>
         <template #empty>
@@ -562,6 +571,51 @@ export default {
 
               this.getUsers();
             });
+        },
+      });
+    },
+    async resetPassword(email, uuid) {
+      this.$buefy.dialog.confirm({
+        title: "Reseting Password",
+        message:
+          "Are you sure you want to <b>reset</b> this user's password? This action cannot be undone.",
+        confirmText: "Reset Password",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: async () => {
+          // Open Loader
+          // Open the loading indicator
+          const loadingComponent = this.$buefy.loading.open({
+            container: null,
+          });
+
+          // Delete user
+          await axios
+            .post(`auth/reset`, {
+              email,
+              uuid,
+            })
+            .then((response) => {
+              this.$buefy.toast.open({
+                message: response.data.title,
+                duration: 2000,
+                type: "is-success",
+              });
+
+              this.getUsers();
+            })
+            .catch((error) => {
+              this.$buefy.toast.open({
+                message: error.response.data.title,
+                duration: 2000,
+                type: "is-danger",
+              });
+
+              this.getUsers();
+            });
+
+          // Close the loading indicator
+          loadingComponent.close();
         },
       });
     },

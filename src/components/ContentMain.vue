@@ -1,7 +1,7 @@
 <template>
   <div class="main-content-nav">
     <!-- Back Button -->
-    <div @click="back" v-if="breadcrumbs.length > 1">
+    <div @click="back">
       <b-icon icon="arrow-left" custom-size="mdi-24px" class="back nav-icon">
       </b-icon>
     </div>
@@ -85,6 +85,14 @@ export default {
           {
             name: this.$route.params.uuid,
             path: `/lessons/${this.$route.params.uuid}`,
+            active: true,
+          },
+        ];
+      } else if (this.$route.name === "Dashboard") {
+        this.breadcrumbs = [
+          {
+            name: "Dashboard",
+            path: "/",
             active: true,
           },
         ];

@@ -79,10 +79,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .date {
-  margin: 0px !important;
-  padding: 0px !important;
+  /* margin: 0px !important; */
+  /* padding: 0px !important; */
 }
 
 .author {

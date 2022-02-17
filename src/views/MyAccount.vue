@@ -36,7 +36,6 @@
               <b-select
                 placeholder="Select a title"
                 expanded
-                :disabled="is_modal_create_loading"
                 v-model="title"
               >
                 <option
@@ -53,7 +52,7 @@
               <b-input placeholder="Surname" v-model="surname"> </b-input>
             </b-field>
             <!-- Grade -->
-            <b-field label="Grade" v-if="grade != 0">
+            <b-field label="Grade" v-if="grade != 0" expanded>
               <b-input placeholder="Grade" v-model="grade"> </b-input>
             </b-field>
           </b-field>
@@ -90,6 +89,7 @@ export default {
       title: "",
       surname: "",
       email: "",
+      grade: "",
     };
   },
   mounted() {
@@ -101,6 +101,7 @@ export default {
         .put("auth/profile", {
           title: this.title,
           surname: this.surname,
+          grade: this.grade,
         })
         .then((response) => {
           this.$buefy.toast.open({
