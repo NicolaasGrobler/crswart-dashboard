@@ -20,6 +20,11 @@ const routes = [
     },
     children: [
       {
+        path: "/",
+        name: "For Me",
+        component: () => import("../views/Dash.vue"),
+      },
+      {
         path: "/my-account",
         name: "My Account",
         component: () => import("../views/MyAccount.vue"),

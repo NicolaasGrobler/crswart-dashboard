@@ -5,27 +5,60 @@
         label="Grade Filter"
         message="Leave blank to show lessons from all grades"
       >
-        <b-checkbox-button v-model="gradeFilter" native-value="8">
+        <b-checkbox-button
+          v-model="gradeFilter"
+          native-value="8"
+          @input="getSubjectFilter(8)"
+        >
           Grade 8
         </b-checkbox-button>
 
-        <b-checkbox-button v-model="gradeFilter" native-value="9">
+        <b-checkbox-button
+          v-model="gradeFilter"
+          native-value="9"
+          @input="getSubjectFilter(9)"
+        >
           Grade 9
         </b-checkbox-button>
 
-        <b-checkbox-button v-model="gradeFilter" native-value="10">
+        <b-checkbox-button
+          v-model="gradeFilter"
+          native-value="10"
+          @input="getSubjectFilter(10)"
+        >
           Grade 10
         </b-checkbox-button>
 
-        <b-checkbox-button v-model="gradeFilter" native-value="11">
+        <b-checkbox-button
+          v-model="gradeFilter"
+          native-value="11"
+          @input="getSubjectFilter(11)"
+        >
           Grade 11
         </b-checkbox-button>
 
-        <b-checkbox-button v-model="gradeFilter" native-value="12">
+        <b-checkbox-button
+          v-model="gradeFilter"
+          native-value="12"
+          @input="getSubjectFilter(12)"
+        >
           Grade 12
         </b-checkbox-button>
       </b-field>
     </div>
+
+    <div class="tile box" style="padding: 10px" v-show="showSubjectFilter">
+      <b-checkbox-button
+        v-model="subjectFilter"
+        v-for="(item, index) in subjects"
+        :key="index"
+        :native-value="item.name"
+        style="margin: 5px"
+      >
+        {{ item.name }}
+      </b-checkbox-button>
+    </div>
+
     <div class="tile is-vertical box">
       <h3>
         Lessons by {{ this.$store.state.user.name }}
@@ -39,7 +72,14 @@
         @click="openLessonModal(lesson)"
         v-for="(lesson, index) of lessons.filter((lesson) => {
           if (gradeFilter.length > 0) {
-            return gradeFilter.includes(lesson.grade);
+            if (subjectFilter.length > 0) {
+              return (
+                gradeFilter.includes(lesson.grade) &&
+                subjectFilter.includes(lesson.subject)
+              );
+            } else {
+              return gradeFilter.includes(lesson.grade);
+            }
           } else {
             return true;
           }
@@ -168,6 +208,9 @@ export default {
       },
       isOpen: 0,
       gradeFilter: [],
+      subjectFilter: [],
+      showSubjectFilter: false,
+      subjects: [],
       is_lesson_modal_loading: false,
       is_lesson_modal_active: false,
     };
@@ -253,6 +296,22 @@ export default {
           uuid: uuid,
         },
       });
+    },
+    async getSubjectFilter(grade) {
+      if (this.gradeFilter.length == 0 || this.gradeFilter.length > 1) {
+        this.showSubjectFilter = false;
+      } else {
+        // Get subjects for grade
+        await axios
+          .get(`subjects/grade/${grade}`)
+          .then((response) => {
+            this.subjects = response.data.subjects;
+            this.showSubjectFilter = true;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   },
 };
