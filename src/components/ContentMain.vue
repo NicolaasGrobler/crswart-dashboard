@@ -23,16 +23,17 @@
 
     <div class="right-side">
       <!-- Welcome Text -->
-      <p style="margin-right: 10px">
+      <p>
         {{ $store.state.user.name }} {{ $store.state.user.surname }}
       </p>
       <!-- Notifications -->
-      <b-icon
+      <!-- <b-icon
         icon="bell-outline"
         custom-size="mdi-24px"
         class="notifications nav-icon"
+        disabled
       >
-      </b-icon>
+      </b-icon> -->
       <!-- Avatar -->
       <img
         src="https://thispersondoesnotexist.com/image"

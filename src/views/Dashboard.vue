@@ -84,6 +84,80 @@ export default {
         .get("auth/current")
         .then((response) => {
           this.$store.commit("setUser", response.data.user);
+
+          if (response.data.user.password_reset) {
+            this.$buefy.dialog.confirm({
+              title: "Password Change",
+              message: `We would recommend that you create your own secure password. You can however choose to keep your current password.`,
+              cancelText: "Keep Current Password",
+              confirmText: "Create New Password",
+              type: "is-success",
+              onConfirm: () => {
+                this.$buefy.dialog.prompt({
+                  message: "Create a new password",
+                  inputAttrs: {
+                    type: "password",
+                    placeholder: "Enter a new password",
+                    value: "",
+                  },
+                  confirmText: "Update Password",
+                  trapFocus: true,
+                  closeOnConfirm: false,
+                  onConfirm: async (value, { close }) => {
+                    await axios
+                      .put("auth/current/password", {
+                        password: value,
+                        email: this.$store.state.user.email,
+                      })
+                      .then((response) => {
+                        this.$buefy.toast.open({
+                          message: response.data.title,
+                          type: "is-success",
+                        });
+                      })
+                      .catch((error) => {
+                        this.$buefy.toast.open({
+                          message: error.response.data.title,
+                          type: "is-danger",
+                        });
+                      });
+
+                    close();
+                  },
+                  onCancel: () => {
+                    axios
+                      .put("auth/current/password", {
+                        password: undefined,
+                      })
+                      .then(() => {
+                        this.$buefy.toast.open("Current password was kept");
+                      })
+                      .catch((error) => {
+                        this.$buefy.toast.open({
+                          message: error.response.data.title,
+                          type: "is-danger",
+                        });
+                      });
+                  },
+                });
+              },
+              onCancel: () => {
+                axios
+                  .put("auth/current/password", {
+                    password: undefined,
+                  })
+                  .then(() => {
+                    this.$buefy.toast.open("Current password was kept");
+                  })
+                  .catch((error) => {
+                    this.$buefy.toast.open({
+                      message: error.response.data.title,
+                      type: "is-danger",
+                    });
+                  });
+              },
+            });
+          }
         })
         .catch(() => {
           this.$router.push("/login");

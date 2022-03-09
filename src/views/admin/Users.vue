@@ -370,6 +370,21 @@ export default {
     this.getUsers();
   },
   methods: {
+    async logout() {
+      // Send post request to the server with token as header (Authorization) to logout user
+      await axios
+        .post("auth/logout")
+        .then((response) => {
+          console.log(response.data.title);
+        })
+        .catch((error) => {
+          console.log(error.response.data.title);
+        });
+      //Delete tokens from local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      this.$router.push("/login");
+    },
     getUsers() {
       // Get Users
       axios
@@ -601,6 +616,11 @@ export default {
                 duration: 2000,
                 type: "is-success",
               });
+
+              // Check if the user who's password is being set is the same as the current user by using the email
+              if (this.$store.state.user.email === email) {
+                this.logout();
+              }
 
               this.getUsers();
             })
