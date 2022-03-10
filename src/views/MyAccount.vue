@@ -33,11 +33,7 @@
           <b-field grouped style="margin-bottom: 20px">
             <!-- Title -->
             <b-field label="Title">
-              <b-select
-                placeholder="Select a title"
-                expanded
-                v-model="title"
-              >
+              <b-select placeholder="Select a title" expanded v-model="title">
                 <option
                   v-for="(title, index) in $store.state.titles"
                   :value="title.title"
@@ -69,7 +65,8 @@
             <b-button
               type="is-danger"
               icon="key"
-              label="Reset Password"
+              label="Change Password"
+              @click="changePassword"
             ></b-button>
           </b-field>
         </div>
@@ -139,6 +136,90 @@ export default {
             type: "is-danger",
           });
         });
+    },
+    async logout() {
+      // Send post request to the server with token as header (Authorization) to logout user
+      await axios.post("auth/logout").catch((error) => {
+        this.$buefy.toast.open({
+          message: error.response.data.title,
+          type: "is-danger",
+        });
+      });
+      //Delete tokens from local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      this.$router.push("/login");
+    },
+    changePassword() {
+      this.$buefy.dialog.prompt({
+        message: "Create a new password",
+        inputAttrs: {
+          type: "password",
+          placeholder: "Enter a new password",
+          value: "",
+        },
+        confirmText: "Update Password",
+        trapFocus: true,
+        closeOnConfirm: false,
+        onConfirm: async (value, { close }) => {
+          let password = value;
+          // Confirm password
+          this.$buefy.dialog.prompt({
+            message: "Confirm new password",
+            inputAttrs: {
+              type: "password",
+              placeholder: "Enter password again",
+              value: "",
+            },
+            confirmText: "Update Password",
+            trapFocus: true,
+            closeOnConfirm: false,
+            onConfirm: async (value, { close }) => {
+              if (password == value) {
+                await axios
+                  .put("auth/current/password", {
+                    password: value,
+                    email: this.$store.state.user.email,
+                  })
+                  .then(() => {
+                    this.$buefy.toast.open({
+                      message:
+                        "Password successfully updated. Please login again.",
+                      type: "is-success",
+                      duration: 2000,
+                    });
+
+                    this.logout();
+                  })
+                  .catch((error) => {
+                    this.$buefy.toast.open({
+                      message: error.response.data.title,
+                      type: "is-danger",
+                    });
+                  });
+              } else {
+                this.$buefy.toast.open({
+                  message: "Passwords did not match thus was not changed",
+                });
+              }
+
+              close();
+            },
+            onCancel: () => {
+              this.$buefy.toast.open({
+                message: "Password was not changed",
+              });
+            },
+          });
+
+          close();
+        },
+        onCancel: () => {
+          this.$buefy.toast.open({
+            message: "Password was not changed",
+          });
+        },
+      });
     },
   },
 };

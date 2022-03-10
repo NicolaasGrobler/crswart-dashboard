@@ -529,6 +529,11 @@ export default {
           .join(", ");
       }
 
+      // Check if user is not a student then set grade to 0
+      if (!this.user.roles.includes("student")) {
+        this.user.grade = 0;
+      }
+
       // Create User
       let user = {
         ...this.user,
