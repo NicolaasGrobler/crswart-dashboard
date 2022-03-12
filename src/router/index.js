@@ -53,6 +53,23 @@ const routes = [
         path: "/lessons",
         name: "Lessons",
         component: () => import("../views/lessons/View.vue"),
+        children: [
+          {
+            path: "/",
+            name: "Grades",
+            component: () => import("../views/lessons/Grades.vue"),
+          },
+          {
+            path: "subjects/:grade",
+            name: "Subjects",
+            component: () => import("../views/lessons/Subjects.vue"),
+          },
+          {
+            path: "subjects/:grade/:subject",
+            name: "Lessons",
+            component: () => import("../views/lessons/Lessons.vue"),
+          },
+        ]
       },
       {
         path: "/lessons/mine",
