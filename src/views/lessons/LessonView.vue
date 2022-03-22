@@ -7,15 +7,30 @@
         $store.state.user.roles.includes('admin')
       "
     >
+      <!-- Back -->
+      <b-button
+        class="button is-primary"
+        @click="
+          $router.push(`/lessons/subjects/${lesson.grade}/${lesson.subject}`)
+        "
+        icon-left="arrow-left"
+        >Grade {{ lesson.grade }} - {{ lesson.subject }} lessons</b-button
+      >
       <!-- Edit -->
       <b-button
         class="is-primary"
         icon-left="pencil"
         @click="editLesson(lesson.uuid)"
+        style="margin-left: 10px"
         >Edit Lesson</b-button
       >
       <!-- Delete -->
-      <b-button class="is-danger" icon-left="delete" @click="deleteLesson" style="margin-left: 10px"
+      <b-button
+        class="is-danger"
+        icon-left="delete"
+        outlined
+        @click="deleteLesson"
+        style="margin-left: 10px"
         >Delete Lesson</b-button
       >
     </div>
@@ -47,25 +62,45 @@
           </p>
         </div>
       </div>
-      <div style="display: flex; align-items: center; margin-top: 20px">
-        <b-icon
-          icon="account"
-          size="mdi-24"
-          style="margin-right: 5px; color: grey"
-        >
-        </b-icon>
-        <h3 class="author">{{ lesson.author }}</h3>
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 20px;
+        "
+      >
+        <div>
+          <h3 style="margin: 0px">{{ lesson.title }}</h3>
+        </div>
+        <div style="display: flex; align-items: center">
+          <h3 class="author">{{ lesson.author }}</h3>
+          <div
+            v-if="author_picture.length > 0"
+            class="avatar"
+            :style="{
+              'background-image': 'url(' + author_picture + ')',
+            }"
+          ></div>
+          <b-icon
+            v-else
+            icon="account"
+            size="mdi-24"
+            style="margin-left: 5px; color: grey"
+          >
+          </b-icon>
+        </div>
       </div>
       <hr />
       <div>
-        <h3>Lesson Description</h3>
+        <h4>Lesson Description</h4>
         <div class="description box" v-html="lesson.description"></div>
       </div>
       <div v-if="JSON.parse(lesson.files.length > 0)" style="margin-top: 20px">
-        <h3>Files</h3>
+        <h4>Files</h4>
         <div class="box">
           <div
-            class="file"
+            class="file file_button"
             v-for="(file, index) in JSON.parse(lesson.files)"
             :key="index"
           >
@@ -77,7 +112,6 @@
               expanded
               icon-left="download"
               class="button is-primary"
-              style="margin-bottom: 10px"
             >
               {{ file.file_name.split(".")[0] }}
             </b-button>
@@ -96,14 +130,30 @@ export default {
   title: "CR Swart Lesson Viewer",
   data() {
     return {
-      lesson: null,
+      lesson: {
+        uuid: "",
+        title: "",
+        description: "",
+        files: "",
+        grade: "",
+      },
+      author_picture: "",
     };
   },
   mounted() {
     axios
-      .get(`/lessons/${this.$route.params.uuid}`)
+      .get(`lessons/${this.$route.params.uuid}`)
       .then((response) => {
         this.lesson = response.data.lesson;
+
+        axios
+          .get(`auth/profile/picture/${response.data.lesson.author_uuid}`)
+          .then((response) => {
+            this.author_picture = response.data.picture;
+          })
+          .catch(() => {
+            this.author_picture = "";
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -133,7 +183,7 @@ export default {
             .delete(`lessons/${this.lesson.uuid}/delete`)
             .then(async (response) => {
               this.$router.push({
-                name: "Lessons"
+                name: "Lessons",
               });
 
               this.$buefy.toast.open({
@@ -156,6 +206,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.description h3:last-child {
+  margin: 0px !important;
+}
+</style>
 
 <style scoped>
 .date {
@@ -180,5 +236,28 @@ export default {
   border-radius: 5px;
   padding: 10px !important;
   font-size: 16px !important;
+}
+
+.file_button {
+  margin-bottom: 10px;
+}
+
+.file_button:last-child {
+  margin-bottom: 0px;
+}
+
+.avatar {
+  border-radius: 50%;
+  border: 2px solid rgb(235, 235, 235);
+  margin-left: 10px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #b89c6a;
+  color: white;
+  background-size: cover;
+  background-position: center;
 }
 </style>

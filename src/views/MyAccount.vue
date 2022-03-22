@@ -3,12 +3,15 @@
     <div class="tile is-ancestor box" style="padding: 30px">
       <div class="tile" style="align-items: center">
         <!-- Profile Picture -->
-        <img
-          src="https://thispersondoesnotexist.com/image"
-          alt="Avatar"
-          width="250"
+        <div
+          :style="{ 'background-image': 'url(' + picture + ')' }"
           class="profile-picture"
-        />
+          @click="isCardModalActive = true"
+          v-if="picture.length > 0"
+        ></div>
+        <div class="profile-picture" v-else @click="isCardModalActive = true">
+          {{ $store.state.user.name[0] }}
+        </div>
         <!-- User Details -->
         <div
           class="tile is-vertical"
@@ -72,6 +75,88 @@
         </div>
       </div>
     </div>
+
+    <b-modal
+      v-model="isCardModalActive"
+      :width="640"
+      scroll="keep"
+      @after-leave="displayUpload = false"
+    >
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+          "
+        >
+          <h3 style="margin: 20px 0px">Profile Picture</h3>
+          <div
+            :style="{ 'background-image': 'url(' + picture + ')' }"
+            class="profile-picture profile-modal"
+            v-if="picture.length > 0"
+          ></div>
+          <div class="profile-picture profile-modal" v-else>
+            {{ $store.state.user.name[0] }}
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            flex-direction: column;
+          "
+        >
+          <div style="width: 400px" v-if="displayUpload">
+            <b-field
+              class="file is-primary"
+              :class="{ 'has-name': !!file }"
+              style="width: 100%; margin-bottom: 10px"
+            >
+              <b-field class="file" style="width: 100%">
+                <b-upload v-model="file" expanded :disabled="loading.save">
+                  <a class="button is-primary is-fullwidth">
+                    <b-icon icon="upload"></b-icon>
+                    <span>{{ file.name || "Click to upload" }}</span>
+                  </a>
+                </b-upload>
+              </b-field>
+            </b-field>
+          </div>
+
+          <div style="display: flex; width: 400px">
+            <b-button
+              v-if="!displayUpload"
+              type="is-primary"
+              icon="camera"
+              label="Upload Picture"
+              style="margin-bottom: 30px; margin-right: 10px; flex: 1"
+              @click="uploadPicture"
+            ></b-button>
+            <b-button
+              v-else
+              type="is-primary"
+              icon="camera"
+              label="Save Picture"
+              style="margin-bottom: 30px; margin-right: 10px; flex: 1"
+              :loading="loading.save"
+              @click="savePicture"
+            ></b-button>
+            <!-- Remove profile picture -->
+            <b-button
+              type="is-danger"
+              icon="trash"
+              label="Remove Picture"
+              style="margin-bottom: 30px; flex: 1"
+              @click="removePicture"
+            ></b-button>
+          </div>
+        </div>
+      </div>
+    </b-modal>
   </section>
 </template>
 
@@ -87,12 +172,121 @@ export default {
       surname: "",
       email: "",
       grade: "",
+      picture: "",
+      loading: {
+        save: false,
+      },
+      file: {},
+      isCardModalActive: false,
+      displayUpload: false,
     };
   },
   mounted() {
     this.getProfile();
   },
   methods: {
+    uploadPicture() {
+      this.displayUpload = true;
+    },
+    async savePicture() {
+      this.loading.save = true;
+
+      let { url } = await axios
+        // TODO: Change the url to the correct to a secure one
+        .post("/lessons/s3URL", {
+          file_name: this.file.name,
+          file_type: this.file.type,
+          file_extension: this.file.name.split(".").pop(),
+        })
+        .then((response) => {
+          return response.data;
+        });
+
+      let axioInstance = axios.create();
+      delete axioInstance.defaults.headers.common["Authorization"];
+
+      let picture_url = url.split("?")[0];
+
+      // Upload file to s3 bucket
+      await axioInstance
+        .put(url, this.file, {
+          headers: {
+            "Content-Type": this.file.type,
+          },
+        })
+        .then((response) => {
+          if (response.status !== 200) {
+            this.$buefy.toast.open({
+              message: "Error uploading profile picture",
+              duration: 2000,
+              type: "is-danger",
+            });
+          } else {
+            axios
+              .put("auth/profile/picture", {
+                url: picture_url,
+              })
+              .then(async (response) => {
+                this.$buefy.toast.open({
+                  message: response.data.title,
+                  duration: 2000,
+                  type: "is-success",
+                });
+
+                // Update profile picture url in store
+                this.$store.commit("updateProfilePicture", picture_url);
+
+                await this.getProfile();
+
+                this.displayUpload = false;
+                this.loading.save = false;
+
+                this.file = {};
+              })
+              .catch((error) => {
+                this.$buefy.toast.open({
+                  message: error.response.data.title,
+                  duration: 2000,
+                  type: "is-danger",
+                });
+              });
+          }
+        });
+    },
+    removePicture() {
+      this.$buefy.dialog.confirm({
+        title: "Deleting profile picture",
+        message:
+          "Are you sure you want to <b>delete</b> your profile picture? This action cannot be undone.",
+        confirmText: "Delete Profile Picture",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: async () => {
+          // Delete user
+          await axios
+            .delete(`auth/profile/picture`)
+            .then((response) => {
+              this.$buefy.toast.open({
+                message: response.data.title,
+                duration: 2000,
+                type: "is-success",
+              });
+
+              this.getProfile();
+            })
+            .catch((error) => {
+              this.$buefy.toast.open({
+                message: error.response.data.title,
+                duration: 2000,
+                type: "is-danger",
+              });
+            });
+        },
+      });
+    },
+    deleteFiles(index) {
+      this.files.splice(index, 1);
+    },
     saveChanges() {
       axios
         .put("auth/profile", {
@@ -120,14 +314,15 @@ export default {
           });
         });
     },
-    getProfile() {
-      axios
+    async getProfile() {
+      await axios
         .get("auth/current")
         .then((response) => {
           this.title = response.data.user.title;
           this.surname = response.data.user.surname;
           this.email = response.data.user.email;
           this.grade = response.data.user.grade;
+          this.picture = response.data.user.picture;
         })
         .catch((error) => {
           this.$buefy.toast.open({
@@ -226,11 +421,32 @@ export default {
 </script>
 
 <style>
+.profile-picture.profile-modal:hover {
+  border: 3px solid rgb(235, 235, 235);
+  cursor: default;
+}
+
 .profile-picture {
   width: 250px;
   height: 250px;
   border-radius: 50%;
   border: 3px solid rgb(235, 235, 235);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 80px;
+  font-weight: 700;
+  color: white;
+  background: #b89c69;
+  transition: 0.3s;
+
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-picture:hover {
+  cursor: pointer;
+  border-color: #856e43;
 }
 
 .my-tile {

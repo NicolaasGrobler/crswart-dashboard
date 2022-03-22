@@ -30,6 +30,12 @@ export default new Vuex.Store({
         ...state.user,
         payload
       }
+    },
+    updateProfilePicture(state, payload) {
+      state.user = {
+        ...state.user,
+        picture: payload
+      }
     }
   },
   // Define plugins

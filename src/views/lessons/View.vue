@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "Lessons",
   title: "CR Swart Lessons",
@@ -17,59 +16,13 @@ export default {
       subject: "",
     };
   },
-  mounted() {
-    this.getLessons();
-  },
-  methods: {
-    async getSubjects() {
-      axios
-        .get(`/subjects/grade/${this.grade}`)
-        .then((response) => {
-          this.subjects = response.data.subjects;
-        })
-        .catch(() => {
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: "Failed to get subjects. Please refresh.",
-            type: "is-danger",
-          });
-        });
-    },
-    async getLessons(subject) {
-      this.subject = subject;
-
-      await axios
-        .get(`/lessons/grade/${this.grade}/${this.subject}`)
-        .then((response) => {
-          this.lessons = response.data.lessons;
-        })
-        .catch((error) => {
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: error.response.data.title,
-            type: "is-danger",
-          });
-        });
-
-      this.displayGrade = false;
-      this.displaySubjects = false;
-      this.displayLessons = true;
-    },
-    viewLesson(uuid) {
-      this.displayGrade = false;
-      this.displaySubjects = false;
-      this.displayLessons = false;
-
-      this.$router.push(`/lessons/${uuid}`);
-    },
-  },
 };
 </script>
 
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition-duration: 0.2s;
+  transition-duration: 0.1s;
   transition-property: opacity;
   transition-timing-function: ease;
 }
@@ -119,10 +72,6 @@ export default {
 .subject:hover {
   background: #947e59;
   color: white;
-}
-
-.lesson_box {
-  cursor: pointer;
 }
 
 .date {

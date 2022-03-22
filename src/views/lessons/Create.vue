@@ -49,6 +49,10 @@
           </option>
         </b-select>
       </b-field>
+      <!-- Title -->
+      <b-field label="Lesson Title">
+        <b-input v-model="title"></b-input>
+      </b-field>
       <!-- Description -->
       <b-field label="Lesson Description">
         <Tiptap v-model="description"></Tiptap>
@@ -128,6 +132,7 @@ export default {
       subject_disabled: true,
       subject_loading: false,
       description: null,
+      title: null,
       files: [],
       lesson_created: false,
       new_lesson_uuid: null,
@@ -225,6 +230,7 @@ export default {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
             date: new Date(),
             grade: this.grade,
+            title: this.title,
             subject: this.subject,
             description: this.description,
             files: files_data,

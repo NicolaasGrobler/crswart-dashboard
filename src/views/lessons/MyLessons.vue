@@ -92,9 +92,16 @@
           align-items: center;
         "
       >
-        Grade {{ lesson.grade }} - {{ lesson.subject }}
-        <div style="display: flex;">
-          <p style="display: flex; align-items: center; margin-bottom: 0px; margin-right: 10px;">
+        Grade {{ lesson.grade }} - {{ lesson.subject }} - {{ lesson.title }}
+        <div style="display: flex">
+          <p
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 0px;
+              margin-right: 10px;
+            "
+          >
             <b-icon icon="calendar" style="margin-right: 5px; color: #555">
             </b-icon>
             {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
@@ -147,6 +154,8 @@
           ></button>
         </header>
         <section class="modal-card-body">
+          <h3>{{ lesson.title }}</h3>
+          <hr />
           <div>
             <h3>Lesson Description</h3>
             <div class="description box" v-html="lesson.description"></div>
@@ -214,6 +223,7 @@ export default {
         id: "",
         uuid: "",
         subject: "",
+        title: "",
         grade: "",
         date: "",
         author: "",
@@ -261,6 +271,7 @@ export default {
       this.lesson = {
         id: "",
         uuid: "",
+        title: "",
         subject: "",
         grade: "",
         date: "",

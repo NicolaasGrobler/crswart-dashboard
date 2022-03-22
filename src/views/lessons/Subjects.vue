@@ -7,8 +7,9 @@
             icon-left="arrow-left"
             >View Grades</b-button>
       </div>
-    <div class="tile box is-vertical" style="padding: 10px">
-      <router-link v-for="subject in subjects" :key="subject.id" :to="`/lessons/subjects/${grade}/${subject.name}`">{{subject.name}}</router-link>
+    <div class="tile box is-vertical" style="padding: 20px">
+        <h3>Grade {{grade}} subjects</h3>
+      <router-link v-for="subject in subjects" :key="subject.id" :to="`/lessons/subjects/${grade}/${subject.name}`" class="button-link">{{subject.name}}</router-link>
     </div>
   </section>
 </template>
@@ -49,4 +50,23 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.button-link {
+    background: #B89C69;
+    color: white;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    transition: 0.1s;
+}
+
+.button-link:hover {
+    background: #947E59;
+    color: white;
+}
+
+.button-link:last-child {
+    margin-bottom: 0;
+}
+</style>

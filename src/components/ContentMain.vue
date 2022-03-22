@@ -23,9 +23,7 @@
 
     <div class="right-side">
       <!-- Welcome Text -->
-      <p>
-        {{ $store.state.user.name }} {{ $store.state.user.surname }}
-      </p>
+      <p>{{ $store.state.user.name }} {{ $store.state.user.surname }}</p>
       <!-- Notifications -->
       <!-- <b-icon
         icon="bell-outline"
@@ -35,13 +33,15 @@
       >
       </b-icon> -->
       <!-- Avatar -->
-      <img
-        src="https://thispersondoesnotexist.com/image"
-        alt="Avatar"
-        width="35px"
+      <div
         class="avatar"
+        :style="{ 'background-image': 'url(' + $store.state.user.picture + ')' }"
+        v-if="$store.state.user.picture.length > 0"
         @click="$router.push('/my-account')"
-      />
+      ></div>
+      <div class="avatar" v-else @click="$router.push('/my-account')">
+        {{ $store.state.user.name[0] }}
+      </div>
     </div>
   </div>
 </template>
@@ -174,6 +174,13 @@ $grey: #363636;
   width: 35px;
   height: 35px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #b89c6a;
+  color: white;
+  background-size: cover;
+  background-position: center;
 }
 
 .avatar:hover {

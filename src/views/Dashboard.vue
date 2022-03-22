@@ -3,7 +3,7 @@
     <div class="sidebar-container">
       <div class="my-sidebar">
         <!-- Emblem -->
-        <img src="../assets/img/emblem.png" alt="Emblem" width="50" />
+        <img src="../assets/img/emblem.png" alt="Emblem" width="50" height="56" style="height: 56px;"/>
         <!-- App Title -->
         <h1 class="app-title">CR Swart</h1>
       </div>
@@ -194,6 +194,7 @@ export default {
 .my-sidebar {
   padding: 20px;
   display: flex;
+  align-items: center;
   border-bottom: 1px solid rgb(235, 235, 235);
 }
 
@@ -226,5 +227,6 @@ export default {
   margin-left: 30px;
   font-size: 2rem;
   font-weight: bold;
+  line-height: 35ßpx;
 }
 </style>

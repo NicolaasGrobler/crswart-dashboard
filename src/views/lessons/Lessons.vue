@@ -5,9 +5,10 @@
             class="button is-primary"
             @click="$router.push(`/lessons/subjects/${grade}`)"
             icon-left="arrow-left"
-            >Grade {{grade}}</b-button>
+            >Grade {{grade}} subjects</b-button>
       </div>
-    <div class="tile box is-vertical" style="padding: 10px">
+    <div class="tile box is-vertical" style="padding: 20px">
+        <h3>Grade {{grade}} - {{subject}} lessons</h3>
       <div v-if="lessons.length > 0 && !loading">
           <div
         class="box lesson_box"
@@ -21,7 +22,7 @@
           align-items: center;
         "
       >
-        Grade {{ lesson.grade }} - {{ lesson.subject }}
+        <div>{{lesson.title}}</div>
         <div style="display: flex">
           <p
             style="
@@ -50,10 +51,12 @@
       </div>
       </div>
         <div v-else-if="!loading">
-            <p>No lessons found.</p>
+            <hr>
+            <h4>No lessons found.</h4>
         </div>
         <div v-else>
-            <p>Loading lessons...</p>
+            <hr>
+            <h4>Loading lessons...</h4>
         </div>
     </div>
   </section>
@@ -116,7 +119,6 @@ export default {
   cursor: pointer;
   transition: background 0.2s;
 }
-
 .date {
   margin: 0px !important;
   border-radius: 5px;
@@ -129,5 +131,15 @@ export default {
 
 .lesson_box {
   cursor: pointer;
+  border: transparent solid 1px;
+  transition: 0.1s;
+}
+
+.lesson_box:hover {
+  border: #947e59 solid 1px;
+}
+
+.lesson_box:last-child {
+    margin-bottom: 7px !important;
 }
 </style>

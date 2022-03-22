@@ -49,6 +49,10 @@
           </option>
         </b-select>
       </b-field>
+      <!-- Title -->
+      <b-field label="Lesson Title">
+        <b-input v-model="title"></b-input>
+      </b-field>
       <!-- Description -->
       <b-field label="Lesson Description">
         <Tiptap v-model="description"></Tiptap>
@@ -110,7 +114,7 @@
           ></button>
         </span>
       </div>
-      <!-- Create -->
+      <!-- Save -->
       <b-button expanded type="is-primary" @click="editLesson"
         >Save Lesson</b-button
       >
@@ -151,6 +155,7 @@ export default {
       subjects: [],
       subject_disabled: true,
       subject_loading: false,
+      title: "",
       description: null,
       uploadedFiles: [],
       files: [],
@@ -171,6 +176,7 @@ export default {
       this.subject = response.data.lesson.subject;
       this.date = response.data.lesson.date;
       this.subject_disabled = false;
+      this.title = response.data.lesson.title;
       this.description = response.data.lesson.description;
       this.uploadedFiles = JSON.parse(response.data.lesson.files);
     },
@@ -267,6 +273,7 @@ export default {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
             grade: this.grade,
             subject: this.subject,
+            title: this.title,
             description: this.description,
             files: files_data,
             updated_on: new Date(),

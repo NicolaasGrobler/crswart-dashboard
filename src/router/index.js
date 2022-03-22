@@ -40,16 +40,6 @@ const routes = [
         component: () => import("../views/admin/Users.vue"),
       },
       {
-        path: "/lessons/create",
-        name: "Create Lesson",
-        component: () => import("../views/lessons/Create.vue"),
-      },
-      {
-        path: "/lessons/edit/:uuid",
-        name: "Edit Lesson",
-        component: () => import("../views/lessons/Edit.vue"),
-      },
-      {
         path: "/lessons",
         name: "Lessons",
         component: () => import("../views/lessons/View.vue"),
@@ -58,6 +48,16 @@ const routes = [
             path: "/",
             name: "Grades",
             component: () => import("../views/lessons/Grades.vue"),
+          },
+          {
+            path: "create",
+            name: "Create Lesson",
+            component: () => import("../views/lessons/Create.vue"),
+          },
+          {
+            path: "edit/:uuid",
+            name: "Edit Lesson",
+            component: () => import("../views/lessons/Edit.vue"),
           },
           {
             path: "subjects/:grade",
@@ -69,22 +69,22 @@ const routes = [
             name: "Lessons",
             component: () => import("../views/lessons/Lessons.vue"),
           },
-        ]
-      },
-      {
-        path: "/lessons/mine",
-        name: "My Lessons",
-        component: () => import("../views/lessons/MyLessons.vue"),
-      },
-      {
-        path: "/lessons/for-me",
-        name: "For Me",
-        component: () => import("../views/lessons/ForMe.vue"),
-      },
-      {
-        path: "/lessons/:uuid",
-        name: "Lesson View",
-        component: () => import("../views/lessons/LessonView.vue"),
+          {
+            path: "/lessons/mine",
+            name: "My Lessons",
+            component: () => import("../views/lessons/MyLessons.vue"),
+          },
+          {
+            path: "/lessons/for-me",
+            name: "For Me",
+            component: () => import("../views/lessons/ForMe.vue"),
+          },
+          {
+            path: ":uuid",
+            name: "Lesson View",
+            component: () => import("../views/lessons/LessonView.vue"),
+          },
+        ],
       },
     ],
   },
