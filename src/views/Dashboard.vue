@@ -96,6 +96,7 @@ export default {
                 this.$buefy.dialog.prompt({
                   message: "Create a new password",
                   inputAttrs: {
+                    "password-reveal": true,
                     type: "password",
                     placeholder: "Enter a new password",
                     value: "",

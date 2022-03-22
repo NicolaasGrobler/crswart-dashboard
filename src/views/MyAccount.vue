@@ -273,6 +273,7 @@ export default {
               });
 
               this.getProfile();
+              this.$store.commit("updateProfilePicture", "");
             })
             .catch((error) => {
               this.$buefy.toast.open({
