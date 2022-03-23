@@ -142,11 +142,11 @@
 
       <div class="tile box is-vertical">
         <h3>Latest Lessons</h3>
-        <template v-if="latest_lessons.length > 0">
+        <template v-if="latest_lessons_all.length > 0">
           <div
             class="tile box lesson_box"
             @click="ViewLesson(lesson.uuid)"
-            v-for="(lesson, index) of latest_lessons"
+            v-for="(lesson, index) of latest_lessons_all"
             :key="index"
             style="
               margin-bottom: 10px;
@@ -183,7 +183,7 @@
             </div>
           </div>
         </template>
-        <div style="display: flex">
+        <div style="display: flex" v-else>
           <div class="my-block">
             <p style="font-size: 20px; font-weight: 700; margin: 0px">
               No Lessons
@@ -424,11 +424,13 @@
       </div>
       <!-- Latest Lesson -->
       <div class="tile box is-vertical">
-        <h3>Your Latest Lesson</h3>
+        <h3>Your Latest Lessons</h3>
         <template v-if="lessons_made">
           <div
             class="tile box lesson_box"
-            @click="ViewLesson(latest_lesson.uuid)"
+            v-for="(lesson, index) in latest_author_lessons"
+            :key="index"
+            @click="ViewLesson(lesson.uuid)"
             style="
               margin-bottom: 10px;
               display: flex;
@@ -436,7 +438,7 @@
               align-items: center;
             "
           >
-            <div>{{ latest_lesson.subject }} - {{ latest_lesson.title }}</div>
+            <div>{{ lesson.subject }} - {{ lesson.title }}</div>
             <div style="display: flex">
               <p
                 style="
@@ -448,20 +450,20 @@
               >
                 <b-icon icon="calendar" style="margin-right: 5px; color: #555">
                 </b-icon>
-                {{ new Date(latest_lesson.date).toLocaleDateString("en-GB") }}
+                {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
               </p>
               <p
                 class="lesson_box_date lesson_box_grade"
                 style="margin-left: 10px !important; background: #640b26"
                 v-if="
-                  new Date(latest_lesson.updated_on).toLocaleDateString(
+                  new Date(lesson.updated_on).toLocaleDateString(
                     'en-GB'
                   ) != '01/01/1970'
                 "
               >
                 Updated
                 {{
-                  new Date(latest_lesson.updated_on).toLocaleDateString("en-GB")
+                  new Date(lesson.updated_on).toLocaleDateString("en-GB")
                 }}
               </p>
             </div>
@@ -718,11 +720,13 @@
       </div>
       <!-- Latest Lesson -->
       <div class="tile box is-vertical">
-        <h3>Latest Lesson</h3>
+        <h3>Latest Lessons</h3>
         <template v-if="lessons_made">
           <div
             class="tile box lesson_box"
-            @click="ViewLesson(latest_lesson.uuid)"
+            @click="ViewLesson(lesson.uuid)"
+            v-for="(lesson, index) in latest_author_lessons"
+            :key="index"
             style="
               margin-bottom: 10px;
               display: flex;
@@ -730,7 +734,7 @@
               align-items: center;
             "
           >
-            <div>{{ latest_lesson.subject }} - {{ latest_lesson.title }}</div>
+            <div>{{ lesson.subject }} - {{ lesson.title }}</div>
             <div style="display: flex">
               <p
                 style="
@@ -742,20 +746,20 @@
               >
                 <b-icon icon="calendar" style="margin-right: 5px; color: #555">
                 </b-icon>
-                {{ new Date(latest_lesson.date).toLocaleDateString("en-GB") }}
+                {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
               </p>
               <p
                 class="lesson_box_date lesson_box_grade"
                 style="margin-left: 10px !important; background: #640b26"
                 v-if="
-                  new Date(latest_lesson.updated_on).toLocaleDateString(
+                  new Date(lesson.updated_on).toLocaleDateString(
                     'en-GB'
                   ) != '01/01/1970'
                 "
               >
                 Updated
                 {{
-                  new Date(latest_lesson.updated_on).toLocaleDateString("en-GB")
+                  new Date(lesson.updated_on).toLocaleDateString("en-GB")
                 }}
               </p>
             </div>
@@ -1029,8 +1033,10 @@ export default {
       total_for_grade: 0,
       latest_lesson: {},
       latest_lessons: [],
+      latest_lessons_all: [],
       all_grade_totals: [],
       all_subject_totals: [],
+      latest_author_lessons: [],
       search_term: "",
       usersData: [],
     };
@@ -1042,7 +1048,7 @@ export default {
       await this.getAllGradeTotals();
       await this.getAllSubjectTotals();
       await this.getTeacherData();
-      await this.get
+      await this.getFiveLatestLessonsAll();
     }
 
     if (
@@ -1058,6 +1064,7 @@ export default {
         this.lessons_made = true;
         await this.getLatestLesson();
         await this.getSubjectTotals();
+        await this.getFiveLatestAuthorLessons();
       }
     }
 
@@ -1174,13 +1181,35 @@ export default {
           return error;
         });
     },
+    async getFiveLatestAuthorLessons() {
+      await axios
+        .get(`/lessons/latest/5/author`)
+        .then((response) => {
+          this.latest_author_lessons = response.data.lessons;
+        })
+        .catch((error) => {
+          console.log(error);
+          return error;
+        });
+    },
+    async getFiveLatestLessonsAll() {
+      await axios
+        .get(`/lessons/latest/5`)
+        .then((response) => {
+          this.latest_lessons_all = response.data.lessons;
+        })
+        .catch((error) => {
+          console.log(error);
+          return error;
+        });
+    },
     async getFiveLatestLessonsFromAll() {
       await axios
         .get(`/lessons/latest/5`)
         .then((response) => {
           this.latest_lessons = response.data.lessons;
         })
-    }
+    },
     async getAllGradeTotals() {
       await axios
         .get(`/lessons/total/grades`)
