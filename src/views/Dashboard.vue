@@ -51,7 +51,7 @@ export default {
       isActive: true,
     };
   },
-  mounted() {
+  beforeMount() {
     this.getUserData();
   },
   methods: {
