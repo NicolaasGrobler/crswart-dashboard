@@ -25,6 +25,7 @@
             user.name.toLowerCase().includes(search_term.toLowerCase())
           )
         "
+        :loading="isLoading"
         style="width: 100%"
         striped
       >
@@ -69,7 +70,7 @@
           >
         </b-table-column>
         <template #empty>
-          <div class="has-text-centered">No records</div>
+          <div class="has-text-centered" v-if="!isLoading">No records</div>
         </template>
       </b-table>
     </div>
@@ -168,6 +169,7 @@
           </b-field>
           <b-field label="Student Grade" v-show="display_grade">
             <b-radio-button
+              :disabled="is_modal_create_loading"
               v-model="user.grade"
               v-for="grade in [8, 9, 10, 11, 12]"
               :key="grade"
@@ -210,7 +212,18 @@
             @click="closeEditModal"
           ></button>
         </header>
-        <section class="modal-card-body">
+        <section
+          class="modal-card-body"
+          style="position: relative; min-height: 500px"
+          v-if="loading.edit"
+        >
+          <b-loading
+            :is-full-page="false"
+            v-model="loading.edit"
+            :can-cancel="false"
+          ></b-loading>
+        </section>
+        <section class="modal-card-body" v-else style="background: white">
           <b-field label="Title">
             <b-select
               placeholder="Select a title"
@@ -299,12 +312,15 @@
             @click="closeEditModal"
             :disabled="is_modal_edit_loading"
           />
-          <b-button
-            label="Save User"
-            type="is-primary"
-            @click="editUser"
-            :loading="is_modal_edit_loading"
-          />
+          <transition name="fade" mode="out-in">
+            <b-button
+              v-show="!loading.edit"
+              label="Save User"
+              type="is-primary"
+              @click="editUser"
+              :loading="is_modal_edit_loading"
+            />
+          </transition>
         </footer>
       </div>
     </b-modal>
@@ -322,7 +338,7 @@ export default {
       data: [],
       user: {
         uuid: "",
-        title: "",
+        title: undefined,
         name: "",
         surname: "",
         grade: "",
@@ -337,6 +353,10 @@ export default {
       is_modal_create_loading: false,
       is_edit_modal_active: false,
       is_modal_edit_loading: false,
+      isLoading: true,
+      loading: {
+        edit: false,
+      },
     };
   },
   computed: {
@@ -385,44 +405,70 @@ export default {
       localStorage.removeItem("refreshToken");
       this.$router.push("/login");
     },
-    getUsers() {
+    async getUsers() {
+      this.isLoading = true;
+
       // Get Users
-      axios
+      await axios
         .get("auth/users")
         .then((response) => {
-          this.data = response.data.users;
+          setTimeout(() => {
+            this.data = response.data.users;
+            this.isLoading = false;
+          }, 300);
         })
-        .catch(() => {
-          this.$router.push("/login");
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: `Unauthorized`,
-            type: "is-danger",
-          });
+        .catch((error) => {
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              duration: 2000,
+              message: error.response.data.title,
+              type: "is-danger",
+            });
+            this.isLoading = false;
+          }, 300);
         });
     },
     getUserData(uuid) {
-      axios.get(`auth/user/${uuid}`).then((response) => {
-        let upload_restrictions;
+      this.loading.edit = true;
 
-        if (response.data.user.upload_restrictions) {
-          upload_restrictions = response.data.user.upload_restrictions
-            .split(",")
-            .map((ext) => {
-              return {
-                extension: ext,
-              };
+      axios
+        .get(`auth/user/${uuid}`)
+        .then((response) => {
+          setTimeout(() => {
+            let upload_restrictions;
+
+            if (response.data.user.upload_restrictions) {
+              upload_restrictions = response.data.user.upload_restrictions
+                .split(",")
+                .map((ext) => {
+                  return {
+                    extension: ext,
+                  };
+                });
+            } else {
+              upload_restrictions = [];
+            }
+
+            this.user = {
+              ...response.data.user,
+              uuid,
+              upload_restrictions,
+            };
+
+            this.loading.edit = false;
+          }, 300);
+        })
+        .catch((error) => {
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              duration: 2000,
+              message: error.response.data.title,
+              type: "is-danger",
             });
-        } else {
-          upload_restrictions = [];
-        }
-
-        this.user = {
-          ...response.data.user,
-          uuid,
-          upload_restrictions,
-        };
-      });
+            this.is_edit_modal_active = false;
+            this.loading.edit = false;
+          }, 300);
+        });
     },
     openCreateModal() {
       console.log(this.$store.state.titles);
@@ -430,7 +476,7 @@ export default {
       // Reset user data
       this.user = {
         uuid: "",
-        title: "",
+        title: undefined,
         name: "",
         surname: "",
         email: "",
@@ -444,11 +490,13 @@ export default {
       this.is_create_modal_active = true;
     },
     openEditModal(user_id) {
-      this.getUserData(user_id);
+      this.loading.edit = true;
 
       // Open Modal
       this.is_edit_modal_active = true;
-      console.log(user_id);
+
+      // Get user data
+      this.getUserData(user_id);
     },
     closeCreateModal() {
       if (this.is_modal_create_loading) {
@@ -463,6 +511,7 @@ export default {
       }
 
       this.is_edit_modal_active = false;
+      this.loading.edit = false;
     },
     async createUser() {
       this.is_modal_create_loading = true;
@@ -486,22 +535,26 @@ export default {
       await axios
         .post("/auth/register", user)
         .then((response) => {
-          this.$buefy.toast.open({
-            message: response.data.title,
-            duration: 2000,
-            type: "is-success",
-          });
-          this.is_modal_create_loading = false;
-          this.getUsers();
-          this.closeCreateModal();
+          setTimeout(async () => {
+            this.$buefy.toast.open({
+              message: response.data.title,
+              duration: 2000,
+              type: "is-success",
+            });
+            this.is_modal_create_loading = false;
+            this.closeCreateModal();
+            this.getUsers();
+          }, 300);
         })
         .catch((error) => {
-          this.$buefy.toast.open({
-            message: error.response.data.title,
-            duration: 2000,
-            type: "is-danger",
-          });
-          this.is_modal_create_loading = false;
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              message: error.response.data.title,
+              duration: 2000,
+              type: "is-danger",
+            });
+            this.is_modal_create_loading = false;
+          }, 300);
         });
     },
     getFilteredExtensions(text) {
@@ -543,22 +596,26 @@ export default {
       axios
         .put(`auth/user/${this.user.uuid}`, user)
         .then((response) => {
-          this.$buefy.toast.open({
-            message: response.data.title,
-            duration: 2000,
-            type: "is-success",
-          });
-          this.is_modal_edit_loading = false;
-          this.is_edit_modal_active = false;
-          this.getUsers();
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              message: response.data.title,
+              duration: 2000,
+              type: "is-success",
+            });
+            this.is_modal_edit_loading = false;
+            this.is_edit_modal_active = false;
+            this.getUsers();
+          }, 300);
         })
         .catch((error) => {
-          this.$buefy.toast.open({
-            message: error.response.data.title,
-            duration: 2000,
-            type: "is-danger",
-          });
-          this.is_modal_edit_loading = false;
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              message: error.response.data.title,
+              duration: 2000,
+              type: "is-danger",
+            });
+            this.is_modal_edit_loading = false;
+          }, 300);
         });
     },
     async deleteUser(uuid) {
@@ -570,6 +627,8 @@ export default {
         type: "is-danger",
         hasIcon: true,
         onConfirm: async () => {
+          this.isLoading = true;
+
           // Delete user
           await axios
             .delete(`auth/user/${uuid}`)
@@ -648,4 +707,16 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.1s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
+</style>

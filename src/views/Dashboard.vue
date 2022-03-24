@@ -27,7 +27,9 @@
     <div class="my-content">
       <ContentMain></ContentMain>
       <div class="content">
+        <transition name="fade" mode="out-in">
         <router-view></router-view>
+        </transition>
       </div>
     </div>
   </section>
@@ -174,6 +176,18 @@ export default {
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.1s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
+}
+
 .my-dashboard {
   display: flex;
   flex-direction: row;

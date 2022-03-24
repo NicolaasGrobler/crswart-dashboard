@@ -25,14 +25,20 @@
         type="is-danger"
         style="margin-left: 10px"
         :disabled="checked_rows.length == 0"
+        :loading="loading.delete"
         @click="deleteSubject"
       >
-        Delete Subject
+        {{ checked_rows.length > 1 ? "Delete Subjects" : "Delete Subject" }}
       </b-button>
     </div>
     <div class="tile is-vertical is-ancestor box">
       <b-field>
-        <b-input placeholder="Search..." type="search" icon="magnify" v-model="search_term">
+        <b-input
+          placeholder="Search..."
+          type="search"
+          icon="magnify"
+          v-model="search_term"
+        >
         </b-input>
         <p class="control">
           <b-button type="is-primary" label="Search" />
@@ -48,6 +54,7 @@
         style="width: 100%"
         striped
         checkable
+        :loading="isLoading"
         :checked-rows.sync="checked_rows"
       >
         <b-table-column field="name" label="Name" v-slot="props">
@@ -101,7 +108,7 @@
         </b-table-column>
 
         <template #empty>
-          <div class="has-text-centered">No records</div>
+          <div class="has-text-centered" v-if="!isLoading">No records</div>
         </template>
       </b-table>
     </div>
@@ -110,6 +117,8 @@
         icon-left="content-save-check"
         type="is-primary"
         @click="saveSubjects"
+        :disabled="isLoading"
+        :loading="loading.save_all"
         >Save Subject Grades</b-button
       >
     </div>
@@ -314,6 +323,11 @@ export default {
         grade_11: false,
         grade_12: false,
       },
+      isLoading: true,
+      loading: {
+        save_all: false,
+        delete: false,
+      },
     };
   },
   watch: {
@@ -326,8 +340,8 @@ export default {
       }
     },
   },
-  mounted() {
-    this.getSubjects();
+  async mounted() {
+    await this.getSubjects();
   },
   methods: {
     closeCreateModal() {
@@ -369,34 +383,42 @@ export default {
       };
     },
     createSubject() {
+      this.is_modal_create_loading = true;
+
       // Create the new subject
-      axios.post("/subjects/create", this.new_subject).then((response) => {
-        console.log(response);
-        this.is_modal_create_loading = false;
-        this.is_create_modal_active = false;
-        this.new_subject = {
-          name: "",
-          grade_8: false,
-          grade_9: false,
-          grade_10: false,
-          grade_11: false,
-          grade_12: false,
-        };
-        this.getSubjects();
-        this.$buefy.toast.open({
-          message: "Subject created successfully",
-          duration: 2000,
-          type: "is-success",
+      axios
+        .post("/subjects/create", this.new_subject)
+        .then(() => {
+          setTimeout(() => {
+            this.is_modal_create_loading = false;
+            this.is_create_modal_active = false;
+            this.new_subject = {
+              name: "",
+              grade_8: false,
+              grade_9: false,
+              grade_10: false,
+              grade_11: false,
+              grade_12: false,
+            };
+            this.getSubjects();
+            this.$buefy.toast.open({
+              message: "Subject created successfully",
+              duration: 2000,
+              type: "is-success",
+            });
+          }, 300);
+        })
+        .catch((error) => {
+          setTimeout(() => {
+            console.log(error);
+            this.is_modal_create_loading = false;
+            this.$buefy.toast.open({
+              message: "Error creating subject",
+              duration: 2000,
+              type: "is-danger",
+            });
+          }, 300);
         });
-      }).catch((error) => {
-        console.log(error);
-        this.is_modal_create_loading = false;
-        this.$buefy.toast.open({
-          message: "Error creating subject",
-          duration: 2000,
-          type: "is-danger",
-        });
-      });
     },
     openEditModal() {
       // Set subject data
@@ -413,6 +435,8 @@ export default {
       this.is_edit_modal_active = true;
     },
     editSubject() {
+      this.is_modal_edit_loading = true;
+
       // Update the subject
       axios
         .put("subjects/update", {
@@ -420,25 +444,38 @@ export default {
           ...this.new_subject,
         })
         .then(async (response) => {
-          this.is_modal_edit_loading = false;
-          this.is_edit_modal_active = false;
-          this.new_subject = {
-            name: "",
-            grade_8: false,
-            grade_9: false,
-            grade_10: false,
-            grade_11: false,
-            grade_12: false,
-          };
-          this.getSubjects();
-          this.$buefy.toast.open({
-            message: response.data.title,
-            duration: 2000,
-            type: "is-success",
-          });
+          setTimeout(async () => {
+            this.is_modal_edit_loading = false;
+            this.is_edit_modal_active = false;
+            this.new_subject = {
+              name: "",
+              grade_8: false,
+              grade_9: false,
+              grade_10: false,
+              grade_11: false,
+              grade_12: false,
+            };
+            this.getSubjects();
+            this.$buefy.toast.open({
+              message: response.data.title,
+              duration: 2000,
+              type: "is-success",
+            });
 
-          this.checked_rows = [];
-          await this.getSubjects();
+            this.checked_rows = [];
+            await this.getSubjects();
+          }, 300);
+        })
+        .catch((error) => {
+          setTimeout(() => {
+            console.log(error);
+            this.is_modal_edit_loading = false;
+            this.$buefy.toast.open({
+              message: "Error updating subject",
+              duration: 2000,
+              type: "is-danger",
+            });
+          }, 300);
         });
     },
     deleteSubject() {
@@ -450,6 +487,8 @@ export default {
         type: "is-danger",
         hasIcon: true,
         onConfirm: async () => {
+          this.loading.delete = true;
+
           axios
             .delete("subjects/delete", {
               data: {
@@ -457,49 +496,66 @@ export default {
               },
             })
             .then((response) => {
-              this.getSubjects();
-              this.$buefy.toast.open({
-                message: response.data.title,
-                duration: 2000,
-                type: "is-success",
-              });
-              this.checked_rows = [];
+              setTimeout(() => {
+                this.getSubjects();
+                this.$buefy.toast.open({
+                  message: response.data.title,
+                  duration: 2000,
+                  type: "is-success",
+                });
+                this.checked_rows = [];
+                this.loading.delete = false;
+              }, 300);
             })
             .catch((error) => {
-              this.$buefy.toast.open({
-                message: error.response.data.title,
-                duration: 2000,
-                type: "is-danger",
-              });
+              setTimeout(() => {
+                this.$buefy.toast.open({
+                  message: error.response.data.title,
+                  duration: 2000,
+                  type: "is-danger",
+                });
+                this.loading.delete = false;
+              }, 300);
             });
         },
       });
     },
     saveSubjects() {
+      this.loading.save_all = true;
+
       axios
         .put("/subjects/update/multiple", {
           subjects: this.data,
         })
         .then((response) => {
-          this.$buefy.toast.open({
-            message: response.data.title,
-            duration: 2000,
-            type: "is-success",
-          });
+          setTimeout(() => {
+            this.loading.save_all = false;
+            this.$buefy.toast.open({
+              message: response.data.title,
+              duration: 2000,
+              type: "is-success",
+            });
+          }, 300);
         })
         .catch((error) => {
-          this.$buefy.toast.open({
-            message: error.response.data.title,
-            duration: 2000,
-            type: "is-danger",
-          });
+          setTimeout(() => {
+            this.loading.save_all = false;
+            this.$buefy.toast.open({
+              message: error.response.data.title,
+              duration: 2000,
+              type: "is-danger",
+            });
+          }, 300);
         });
     },
-    getSubjects() {
-      axios
+    async getSubjects() {
+      await axios
         .get("subjects")
         .then((response) => {
-          this.data = response.data.subjects;
+          setTimeout(() => {
+            this.isLoading = false;
+            this.data = response.data.subjects;
+          }, 300);
         })
         .catch((error) => {
           alert(error);

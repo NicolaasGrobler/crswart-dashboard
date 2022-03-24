@@ -41,51 +41,52 @@ const routes = [
       },
       {
         path: "/lessons",
-        name: "Lessons",
-        component: () => import("../views/lessons/View.vue"),
-        children: [
-          {
-            path: "/",
-            name: "Grades",
-            component: () => import("../views/lessons/Grades.vue"),
-          },
-          {
-            path: "create",
-            name: "Create Lesson",
-            component: () => import("../views/lessons/Create.vue"),
-          },
-          {
-            path: "edit/:uuid",
-            name: "Edit Lesson",
-            component: () => import("../views/lessons/Edit.vue"),
-          },
-          {
-            path: "subjects/:grade",
-            name: "Subjects",
-            component: () => import("../views/lessons/Subjects.vue"),
-          },
-          {
-            path: "subjects/:grade/:subject",
-            name: "Lessons",
-            component: () => import("../views/lessons/Lessons.vue"),
-          },
-          {
-            path: "/lessons/mine",
-            name: "My Lessons",
-            component: () => import("../views/lessons/MyLessons.vue"),
-          },
-          {
-            path: "/lessons/for-me",
-            name: "For Me",
-            component: () => import("../views/lessons/ForMe.vue"),
-          },
-          {
-            path: ":uuid",
-            name: "Lesson View",
-            component: () => import("../views/lessons/LessonView.vue"),
-          },
-        ],
+        name: "Grades",
+        component: () => import("../views/lessons/Grades.vue"),
       },
+      {
+        path: "/lessons/create",
+        name: "Create Lesson",
+        component: () => import("../views/lessons/Create.vue"),
+      },
+      {
+        path: "/lessons/edit/:uuid",
+        name: "Edit Lesson",
+        component: () => import("../views/lessons/Edit.vue"),
+      },
+      {
+        path: "/lessons/subjects/:grade",
+        name: "Subjects",
+        component: () => import("../views/lessons/Subjects.vue"),
+      },
+      {
+        path: "/lessons/subjects/:grade/:subject",
+        name: "Lessons",
+        component: () => import("../views/lessons/Lessons.vue"),
+      },
+      {
+        path: "/lessons/mine",
+        name: "My Lessons",
+        component: () => import("../views/lessons/MyLessons.vue"),
+      },
+      {
+        path: "/lessons/for-me",
+        name: "For Me",
+        component: () => import("../views/lessons/ForMe.vue"),
+      },
+      {
+        path: "/lessons/:uuid",
+        name: "Lesson View",
+        component: () => import("../views/lessons/LessonView.vue"),
+      },
+      // {
+      //   path: "/lessons",
+      //   name: "Lessons",
+      //   component: () => import("../views/lessons/View.vue"),
+      //   children: [
+          
+      //   ],
+      // },
     ],
   },
   {

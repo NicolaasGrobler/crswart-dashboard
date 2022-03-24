@@ -1,63 +1,61 @@
 <template>
   <section class="container">
-      <div class="box tile">
-          <b-button
-            class="button is-primary"
-            @click="$router.push(`/lessons/subjects/${grade}`)"
-            icon-left="arrow-left"
-            >Grade {{grade}} subjects</b-button>
-      </div>
-    <div class="tile box is-vertical" style="padding: 20px">
-        <h3>Grade {{grade}} - {{subject}} lessons</h3>
-      <div v-if="lessons.length > 0 && !loading">
-          <div
-        class="box lesson_box"
-        @click="viewLesson(lesson.uuid)"
-        v-for="(lesson, index) of lessons"
-        :key="index"
-        style="
-          margin-bottom: 10px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
+    <div class="box tile">
+      <b-button
+        class="button is-primary"
+        @click="$router.push(`/lessons/subjects/${grade}`)"
+        icon-left="arrow-left"
+        >Grade {{ grade }} subjects</b-button
       >
-        <div>{{lesson.title}}</div>
-        <div style="display: flex">
-          <p
-            style="
-              display: flex;
-              align-items: center;
-              margin-bottom: 0px;
-              margin-right: 10px;
-            "
-          >
-            <b-icon icon="calendar" style="margin-right: 5px; color: #555">
-            </b-icon>
-            {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
-          </p>
-          <p
-            class="date grade"
-            style="margin-left: 10px !important; background: #640b26"
-            v-if="
-              new Date(lesson.updated_on).toLocaleDateString('en-GB') !=
-              '01/01/1970'
-            "
-          >
-            Updated
-            {{ new Date(lesson.updated_on).toLocaleDateString("en-GB") }}
-          </p>
+    </div>
+    <div class="tile box is-vertical" style="padding: 20px; position: relative">
+      <h3>Grade {{ grade }} - {{ subject }} lessons</h3>
+      <b-loading :is-full-page="false" v-model="loading"></b-loading>
+      <div v-if="lessons.length > 0 && !loading">
+        <div
+          class="box lesson_box"
+          @click="viewLesson(lesson.uuid)"
+          v-for="(lesson, index) of lessons"
+          :key="index"
+          style="
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>{{ lesson.title }}</div>
+          <div style="display: flex">
+            <p
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 0px;
+                margin-right: 10px;
+              "
+            >
+              <b-icon icon="calendar" style="margin-right: 5px; color: #555">
+              </b-icon>
+              {{ new Date(lesson.date).toLocaleDateString("en-GB") }}
+            </p>
+            <p
+              class="date grade"
+              style="margin-left: 10px !important; background: #640b26"
+              v-if="
+                new Date(lesson.updated_on).toLocaleDateString('en-GB') !=
+                '01/01/1970'
+              "
+            >
+              Updated
+              {{ new Date(lesson.updated_on).toLocaleDateString("en-GB") }}
+            </p>
+          </div>
         </div>
       </div>
+      <div v-else-if="!loading">
+        <hr />
+        <h4>No lessons found.</h4>
       </div>
-        <div v-else-if="!loading">
-            <hr>
-            <h4>No lessons found.</h4>
-        </div>
-        <div v-else>
-            <hr>
-            <h4>Loading lessons...</h4>
-        </div>
     </div>
   </section>
 </template>
@@ -83,20 +81,26 @@ export default {
   },
   methods: {
     async getLessons() {
+      this.loading = true;
+
       await axios
         .get(`/lessons/grade/${this.grade}/${this.subject}`)
         .then((response) => {
+          setTimeout(() => {
           this.lessons = response.data.lessons;
+          this.loading = false;
+          }, 200);
         })
         .catch((error) => {
+          setTimeout(() => {
           this.$buefy.toast.open({
             duration: 2000,
             message: error.response.data.title,
             type: "is-danger",
           });
+          this.loading = false;
+          }, 200);
         });
-
-        this.loading = false;
     },
     viewLesson(uuid) {
       this.$router.push(`/lessons/${uuid}`);
@@ -140,6 +144,6 @@ export default {
 }
 
 .lesson_box:last-child {
-    margin-bottom: 7px !important;
+  margin-bottom: 7px !important;
 }
 </style>

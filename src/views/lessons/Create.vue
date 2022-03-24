@@ -34,7 +34,9 @@
       </b-field>
       <b-field label="Subject">
         <b-select
-          placeholder="Select a subject"
+          :placeholder="
+            subject_loading ? 'Loading Subjects...' : 'Select a subject'
+          "
           expanded
           v-model="subject"
           :disabled="subject_disabled"
@@ -140,17 +142,22 @@ export default {
   },
   methods: {
     async gradeChanged() {
+      // Enable the subject select
+      this.subject_disabled = true;
       // Set Loading State to true
       this.subject_loading = true;
 
       // Get Subjects for the selected grade
       await this.getSubjects();
 
-      // Set Loading State to false
-      this.subject_loading = false;
-      // Enable the subject select
-      this.subject_disabled = false;
+      setTimeout(() => {
+        // Set Loading State to false
+        this.subject_loading = false;
+        // Enable the subject select
+        this.subject_disabled = false;
+      }, 300);
     },
+
     async createLesson() {
       if (this.files.length === 0) {
         this.$buefy.toast.open({
@@ -212,9 +219,6 @@ export default {
           });
       }
 
-      // Close the loading indicator
-      loadingComponent.close();
-
       // Check if any files failed to upload
       if (failed) {
         this.$buefy.toast.open({
@@ -225,7 +229,7 @@ export default {
           type: "is-danger",
         });
       } else {
-        axios
+        await axios
           .post("/lessons/create", {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
             date: new Date(),
@@ -236,28 +240,33 @@ export default {
             files: files_data,
           })
           .then((response) => {
-            this.$buefy.toast.open({
-              duration: 2000,
-              message: response.data.title,
-              type: "is-success",
-            });
+            setTimeout(() => {
+              this.$buefy.toast.open({
+                duration: 2000,
+                message: response.data.title,
+                type: "is-success",
+              });
 
-            // Reset the form
-            this.grade = null;
-            this.subject = null;
-            this.description = null;
-            this.files = [];
+              // Reset the form
+              this.grade = null;
+              this.subject = null;
+              this.description = null;
+              this.files = [];
 
-            this.lesson_created = true;
-            this.new_lesson_uuid = response.data.lesson.uuid;
+              this.lesson_created = true;
+              this.new_lesson_uuid = response.data.lesson.uuid;
+
+              // Close the loading indicator
+              loadingComponent.close();
+            }, 300);
           });
       }
     },
     deleteFiles(index) {
       this.files.splice(index, 1);
     },
-    getSubjects() {
-      axios
+    async getSubjects() {
+      await axios
         .get(`subjects/grade/${this.grade}`)
         .then((response) => {
           console.log(response.data);

@@ -47,26 +47,35 @@
       </b-field>
     </div>
 
-    <div class="tile box" style="padding: 10px" v-show="showSubjectFilter">
-      <b-checkbox-button
+    <transition name="fade">
+    <div class="tile box" v-show="showSubjectFilter">
+      <b-field
+      label="Subject Filter"
+        message="Leave blank to show lessons from all subjects">
+      <div style="display: flex">
+        <b-checkbox-button
         v-model="subjectFilter"
         v-for="(item, index) in subjects"
         :key="index"
         :native-value="item.name"
-        style="margin: 5px"
+        class="my-checkbox"
       >
         {{ item.name }}
       </b-checkbox-button>
+      </div>
+      </b-field>
     </div>
+    </transition>
 
-    <div class="tile is-vertical box">
+    <div class="tile is-vertical box" style="position: relative">
       <h3>
         Lessons by {{ this.$store.state.user.name }}
         {{ this.$store.state.user.surname }}
       </h3>
 
       <hr />
-
+      <b-loading :is-full-page="false" v-model="loading"></b-loading>
+      
       <div
         class="box lesson_box"
         @click="openLessonModal(lesson)"
@@ -74,11 +83,11 @@
           if (gradeFilter.length > 0) {
             if (subjectFilter.length > 0) {
               return (
-                gradeFilter.includes(lesson.grade) &&
+                gradeFilter.includes((lesson.grade).toString()) &&
                 subjectFilter.includes(lesson.subject)
               );
             } else {
-              return gradeFilter.includes(lesson.grade);
+              return gradeFilter.includes((lesson.grade).toString());
             }
           } else {
             return true;
@@ -124,7 +133,7 @@
         v-if="
           lessons.filter((lesson) => {
             if (gradeFilter.length > 0) {
-              return gradeFilter.includes(lesson.grade);
+              return gradeFilter.includes((lesson.grade).toString());
             } else {
               return true;
             }
@@ -236,6 +245,7 @@ export default {
       subjects: [],
       is_lesson_modal_loading: false,
       is_lesson_modal_active: false,
+      loading: true,
     };
   },
   mounted() {
@@ -243,11 +253,16 @@ export default {
   },
   methods: {
     async getLessons() {
+      this.loading = true;
+
       // Get all lessons created by current user
       await axios
         .get(`lessons/author/current`)
         .then((response) => {
-          this.lessons = response.data.lessons;
+          setTimeout(() => {
+            this.lessons = response.data.lessons;
+            this.loading = false;
+          }, 300);
         })
         .catch((error) => {
           console.log(error);
@@ -342,6 +357,17 @@ export default {
 </script>
 
 <style scoped>
+.fade-enter-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
+}
+
 .lesson_box {
   cursor: pointer;
 }
@@ -358,5 +384,17 @@ export default {
   align-items: center;
   color: white;
   padding: 10px;
+}
+
+.my-checkbox {
+  margin: 5px;
+}
+
+.my-checkbox:first-child {
+  margin-left: 0px;
+}
+
+.my-checkbox:last-child {
+  margin-right: 0px;
 }
 </style>

@@ -183,14 +183,18 @@ export default {
     async gradeChanged() {
       // Set Loading State to true
       this.subject_loading = true;
+      // Enable the subject select
+      this.subject_disabled = true;
 
       // Get Subjects for the selected grade
       await this.getSubjects();
 
-      // Set Loading State to false
-      this.subject_loading = false;
-      // Enable the subject select
-      this.subject_disabled = false;
+      setTimeout(() => {
+        // Set Loading State to false
+        this.subject_loading = false;
+        // Enable the subject select
+        this.subject_disabled = false;
+      }, 300);
     },
     async editLesson() {
       if (this.files.length === 0 && this.uploadedFiles.length === 0) {
@@ -253,9 +257,6 @@ export default {
           });
       }
 
-      // Close the loading indicator
-      loadingComponent.close();
-
       // Check if any files failed to upload
       if (failed) {
         this.$buefy.toast.open({
@@ -265,10 +266,12 @@ export default {
           )}`,
           type: "is-danger",
         });
+
+        loadingComponent.close();
       } else {
         files_data = files_data.concat(this.uploadedFiles);
 
-        axios
+        await axios
           .post(`/lessons/edit/${this.$route.params.uuid}`, {
             author: `${this.$store.state.user.title} ${this.$store.state.user.surname}`,
             grade: this.grade,
@@ -280,28 +283,31 @@ export default {
             uuid: this.$route.params.uuid,
           })
           .then((response) => {
-            this.$buefy.toast.open({
-              duration: 2000,
-              message: response.data.title,
-              type: "is-success",
-            });
+            setTimeout(() => {
+              this.$buefy.toast.open({
+                duration: 2000,
+                message: response.data.title,
+                type: "is-success",
+              });
 
-            // Reset the form
-            this.grade = null;
-            this.subject = null;
-            this.description = null;
-            this.files = [];
+              // Reset the form
+              this.grade = null;
+              this.subject = null;
+              this.description = null;
+              this.files = [];
 
-            this.lesson_edited = true;
-            this.new_lesson_uuid = response.data.lesson.uuid;
+              this.lesson_edited = true;
+              this.new_lesson_uuid = response.data.lesson.uuid;
+              loadingComponent.close();
+            }, 300);
           });
       }
     },
     deleteFiles(index) {
       this.files.splice(index, 1);
     },
-    getSubjects() {
-      axios
+    async getSubjects() {
+      await axios
         .get(`subjects/grade/${this.grade}`)
         .then((response) => {
           console.log(response.data);
@@ -312,7 +318,7 @@ export default {
         });
     },
     reset() {
-      this.$router.go(this.$router.currentRoute)
+      this.$router.go(this.$router.currentRoute);
     },
   },
 };

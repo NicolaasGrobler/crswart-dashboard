@@ -1,163 +1,188 @@
 <template>
-  <section class="container" style="padding: 20px">
-    <div class="tile is-ancestor box" style="padding: 30px">
-      <div class="tile" style="align-items: center">
-        <!-- Profile Picture -->
-        <div
-          :style="{ 'background-image': 'url(' + picture + ')' }"
-          class="profile-picture"
-          @click="isCardModalActive = true"
-          v-if="picture.length > 0"
-        ></div>
-        <div class="profile-picture" v-else @click="isCardModalActive = true">
-          {{ $store.state.user.name[0] }}
-        </div>
-        <!-- User Details -->
-        <div
-          class="tile is-vertical"
-          style="padding: 20px; justify-content: center; margin-left: 20px"
-        >
-          <!-- User Name -->
-          <h1>
-            {{ $store.state.user.title }} {{ $store.state.user.name }}
-            {{ $store.state.user.surname }}
-          </h1>
-          <!-- User Email -->
-          <b-field>
-            <b-input
-              placeholder="Email"
-              :value="email"
-              type="email"
-              readonly
-              icon="email"
-            >
-            </b-input>
-          </b-field>
-          <b-field grouped style="margin-bottom: 20px">
-            <!-- Title -->
-            <b-field label="Title">
-              <b-select placeholder="Select a title" expanded v-model="title">
-                <option
-                  v-for="(title, index) in $store.state.titles"
-                  :value="title.title"
-                  :key="index"
-                >
-                  {{ title.title }}
-                </option>
-              </b-select>
-            </b-field>
-            <!-- User Surname -->
-            <b-field label="Surname" expanded>
-              <b-input placeholder="Surname" v-model="surname"> </b-input>
-            </b-field>
-            <!-- Grade -->
-            <b-field label="Grade" v-if="grade != 0" expanded>
-              <b-input placeholder="Grade" v-model="grade"> </b-input>
-            </b-field>
-          </b-field>
-          <!-- Password Reset button -->
-          <b-field>
-            <b-button
-              type="is-primary"
-              outlined
-              icon="key"
-              label="Save Changes"
-              style="margin-right: 10px"
-              @click="saveChanges"
-            ></b-button>
-            <b-button
-              type="is-danger"
-              icon="key"
-              label="Change Password"
-              @click="changePassword"
-            ></b-button>
-          </b-field>
-        </div>
-      </div>
-    </div>
-
-    <b-modal
-      v-model="isCardModalActive"
-      :width="640"
-      scroll="keep"
-      @after-leave="displayUpload = false"
+  <div style="height: 100%">
+    <section
+      v-show="isLoading"
+      style="width: 100%; height: 100%; position: relative"
     >
-      <div class="card">
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          "
-        >
-          <h3 style="margin: 20px 0px">Profile Picture</h3>
-          <div
-            :style="{ 'background-image': 'url(' + picture + ')' }"
-            class="profile-picture profile-modal"
-            v-if="picture.length > 0"
-          ></div>
-          <div class="profile-picture profile-modal" v-else>
-            {{ $store.state.user.name[0] }}
-          </div>
-        </div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-            flex-direction: column;
-          "
-        >
-          <div style="width: 400px" v-if="displayUpload">
-            <b-field
-              class="file is-primary"
-              :class="{ 'has-name': !!file }"
-              style="width: 100%; margin-bottom: 10px"
-            >
-              <b-field class="file" style="width: 100%">
-                <b-upload v-model="file" expanded :disabled="loading.save">
-                  <a class="button is-primary is-fullwidth">
-                    <b-icon icon="upload"></b-icon>
-                    <span>{{ file.name || "Click to upload" }}</span>
-                  </a>
-                </b-upload>
-              </b-field>
-            </b-field>
-          </div>
-
-          <div style="display: flex; width: 400px">
-            <b-button
-              v-if="!displayUpload"
-              type="is-primary"
-              icon="camera"
-              label="Upload Picture"
-              style="margin-bottom: 30px; margin-right: 10px; flex: 1"
-              @click="uploadPicture"
-            ></b-button>
-            <b-button
+      <b-loading :is-full-page="false" v-model="isLoading"></b-loading>
+    </section>
+    <transition name="fade" mode="out-in">
+      <section class="container" style="padding: 20px" v-show="!isLoading">
+        <div class="tile is-ancestor box" style="padding: 30px">
+          <div class="tile" style="align-items: center">
+            <!-- Profile Picture -->
+            <div
+              :style="{ 'background-image': 'url(' + picture + ')' }"
+              class="profile-picture"
+              @click="isCardModalActive = true"
+              v-if="picture.length > 0"
+            ></div>
+            <div
+              class="profile-picture"
               v-else
-              type="is-primary"
-              icon="camera"
-              label="Save Picture"
-              style="margin-bottom: 30px; margin-right: 10px; flex: 1"
-              :loading="loading.save"
-              @click="savePicture"
-            ></b-button>
-            <!-- Remove profile picture -->
-            <b-button
-              type="is-danger"
-              icon="trash"
-              label="Remove Picture"
-              style="margin-bottom: 30px; flex: 1"
-              @click="removePicture"
-            ></b-button>
+              @click="isCardModalActive = true"
+            >
+              {{ $store.state.user.name[0] }}
+            </div>
+            <!-- User Details -->
+            <div
+              class="tile is-vertical"
+              style="padding: 20px; justify-content: center; margin-left: 20px"
+            >
+              <!-- User Name -->
+              <h1>
+                {{ $store.state.user.title }} {{ $store.state.user.name }}
+                {{ $store.state.user.surname }}
+              </h1>
+              <!-- User Email -->
+              <b-field>
+                <b-input
+                  placeholder="Email"
+                  :value="email"
+                  type="email"
+                  readonly
+                  icon="email"
+                >
+                </b-input>
+              </b-field>
+              <b-field grouped style="margin-bottom: 20px">
+                <!-- Title -->
+                <b-field label="Title">
+                  <b-select
+                    placeholder="Select a title"
+                    expanded
+                    v-model="title"
+                  >
+                    <option
+                      v-for="(title, index) in $store.state.titles"
+                      :value="title.title"
+                      :key="index"
+                    >
+                      {{ title.title }}
+                    </option>
+                  </b-select>
+                </b-field>
+                <!-- User Surname -->
+                <b-field label="Surname" expanded>
+                  <b-input placeholder="Surname" v-model="surname"> </b-input>
+                </b-field>
+                <!-- Grade -->
+                <b-field label="Grade" v-if="grade != 0" expanded>
+                  <b-input placeholder="Grade" v-model="grade"> </b-input>
+                </b-field>
+              </b-field>
+              <!-- Password Reset button -->
+              <b-field>
+                <b-button
+                  type="is-primary"
+                  outlined
+                  icon="key"
+                  label="Save Changes"
+                  style="margin-right: 10px"
+                  @click="saveChanges"
+                ></b-button>
+                <b-button
+                  type="is-danger"
+                  icon="key"
+                  label="Change Password"
+                  @click="changePassword"
+                ></b-button>
+              </b-field>
+            </div>
           </div>
         </div>
-      </div>
-    </b-modal>
-  </section>
+
+        <b-modal
+          v-model="isCardModalActive"
+          :width="640"
+          scroll="keep"
+          @after-leave="displayUpload = false"
+        >
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+              "
+            >
+              <h3 style="margin: 20px 0px">Profile Picture</h3>
+              <div
+                :style="{ 'background-image': 'url(' + picture + ')' }"
+                class="profile-picture profile-modal"
+                v-if="picture.length > 0"
+              ></div>
+              <div class="profile-picture profile-modal" v-else>
+                {{ $store.state.user.name[0] }}
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 30px;
+                flex-direction: column;
+              "
+            >
+              <transition name="fade" mode="out-in">
+                <div style="width: 400px" v-if="displayUpload">
+                  <b-field
+                    class="file is-primary"
+                    :class="{ 'has-name': !!file }"
+                    style="width: 100%; margin-bottom: 10px"
+                  >
+                    <b-field class="file" style="width: 100%">
+                      <b-upload
+                        v-model="file"
+                        expanded
+                        :disabled="loading.save"
+                      >
+                        <a class="button is-primary is-fullwidth">
+                          <b-icon icon="upload"></b-icon>
+                          <span>{{ file.name || "Click to upload" }}</span>
+                        </a>
+                      </b-upload>
+                    </b-field>
+                  </b-field>
+                </div>
+              </transition>
+
+              <div style="display: flex; width: 400px">
+                <b-button
+                  v-if="!displayUpload"
+                  type="is-primary"
+                  icon="camera"
+                  label="Upload Picture"
+                  style="margin-bottom: 30px; margin-right: 10px; flex: 1"
+                  @click="uploadPicture"
+                ></b-button>
+                <b-button
+                  v-else
+                  type="is-primary"
+                  icon="camera"
+                  label="Save Picture"
+                  style="margin-bottom: 30px; margin-right: 10px; flex: 1"
+                  :loading="loading.save"
+                  @click="savePicture"
+                ></b-button>
+                <!-- Remove profile picture -->
+                <b-button
+                  type="is-danger"
+                  icon="trash"
+                  label="Remove Picture"
+                  :loading="loading.delete"
+                  style="margin-bottom: 30px; flex: 1"
+                  @click="removePicture"
+                ></b-button>
+              </div>
+            </div>
+          </div>
+        </b-modal>
+      </section>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -175,20 +200,35 @@ export default {
       picture: "",
       loading: {
         save: false,
+        delete: false,
       },
       file: {},
       isCardModalActive: false,
       displayUpload: false,
+      isLoading: true,
     };
   },
-  mounted() {
-    this.getProfile();
+  async mounted() {
+    await this.getProfile();
+
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 100);
   },
   methods: {
     uploadPicture() {
       this.displayUpload = true;
     },
     async savePicture() {
+      if (!this.file.name) {
+        this.$buefy.toast.open({
+          message: "Please select a picture",
+          duration: 2000,
+          type: "is-danger",
+        });
+        return;
+      }
+
       this.loading.save = true;
 
       let { url } = await axios
@@ -239,7 +279,6 @@ export default {
                 await this.getProfile();
 
                 this.displayUpload = false;
-                this.loading.save = false;
 
                 this.file = {};
               })
@@ -252,6 +291,10 @@ export default {
               });
           }
         });
+
+      setTimeout(() => {
+        this.loading.save = false;
+      }, 100);
     },
     removePicture() {
       this.$buefy.dialog.confirm({
@@ -262,7 +305,9 @@ export default {
         type: "is-danger",
         hasIcon: true,
         onConfirm: async () => {
-          // Delete user
+          this.loading.delete = true;
+
+          // Delete users picture
           await axios
             .delete(`auth/profile/picture`)
             .then((response) => {
@@ -282,6 +327,10 @@ export default {
                 type: "is-danger",
               });
             });
+
+          setTimeout(() => {
+            this.loading.delete = false;
+          }, 100);
         },
       });
     },
@@ -421,7 +470,19 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
+
 .profile-picture.profile-modal:hover {
   border: 3px solid rgb(235, 235, 235);
   cursor: default;
