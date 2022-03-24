@@ -67,7 +67,7 @@
                   <b-input placeholder="Surname" v-model="surname"> </b-input>
                 </b-field>
                 <!-- Grade -->
-                <b-field label="Grade" v-if="grade != 0" expanded>
+                <b-field label="Grade" v-if="grade != 0" expanded style="max-width: 100px;">
                   <b-input placeholder="Grade" v-model="grade"> </b-input>
                 </b-field>
               </b-field>

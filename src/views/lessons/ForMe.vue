@@ -1,21 +1,23 @@
 <template>
   <section class="container">
-    <div class="tile box" style="padding: 10px;">
+    <div class="tile box" style="padding: 10px">
       <b-checkbox-button
         v-model="subjectFilter"
         v-for="(item, index) in subjects"
         :key="index"
         :native-value="item.name"
-        style="margin: 5px;"
+        style="margin: 5px"
       >
         {{ item.name }}
       </b-checkbox-button>
     </div>
 
-    <div class="tile is-vertical box">
+    <div class="tile is-vertical box" style="position: relative">
       <h3>Latest Grade {{ this.$store.state.user.grade }} Lessons</h3>
 
       <hr />
+
+      <b-loading :is-full-page="false" v-model="isLoading"></b-loading>
 
       <div
         class="box lesson_box"
@@ -51,7 +53,7 @@
             } else {
               return true;
             }
-          }).length == 0
+          }).length == 0 && !isLoading
         "
       >
         <h4>No lessons found</h4>
@@ -80,6 +82,7 @@ export default {
       isOpen: 0,
       subjects: [],
       subjectFilter: [],
+      isLoading: true,
     };
   },
   computed: {
@@ -88,13 +91,16 @@ export default {
     },
   },
   methods: {
-    getLessons() {
+    async getLessons() {
       // Get all lessons created by current user
-      axios
+      await axios
         .get(`/lessons/grade/${this.userGrade}`)
         .then((response) => {
-          console.log("Lessons", response.data.lessons);
-          this.lessons = response.data.lessons;
+          setTimeout(() => {
+            this.lessons = response.data;
+            this.lessons = response.data.lessons;
+            this.isLoading = false;
+          }, 500);
         })
         .catch((error) => {
           console.log(error);
@@ -119,7 +125,7 @@ export default {
           uuid: uuid,
         },
       });
-    }
+    },
   },
   async mounted() {
     await this.getLessons();
