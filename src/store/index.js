@@ -28,7 +28,8 @@ export default new Vuex.Store({
     updateProfile(state, payload) {
       state.user = {
         ...state.user,
-        payload
+        surname: payload.surname,
+        title: payload.title,
       }
     },
     updateProfilePicture(state, payload) {

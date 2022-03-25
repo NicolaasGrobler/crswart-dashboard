@@ -63,11 +63,16 @@
                   </b-select>
                 </b-field>
                 <!-- User Surname -->
-                <b-field label="Surname" expanded>
+                <b-field label="Surname" expanded :type="errors.surname ? 'is-danger' : ''">
                   <b-input placeholder="Surname" v-model="surname"> </b-input>
                 </b-field>
                 <!-- Grade -->
-                <b-field label="Grade" v-if="grade != 0" expanded style="max-width: 100px;">
+                <b-field
+                  label="Grade"
+                  v-if="grade != 0"
+                  expanded
+                  style="max-width: 100px"
+                >
                   <b-input placeholder="Grade" v-model="grade"> </b-input>
                 </b-field>
               </b-field>
@@ -80,6 +85,7 @@
                   label="Save Changes"
                   style="margin-right: 10px"
                   @click="saveChanges"
+                  :loading="loading.saveChanges"
                 ></b-button>
                 <b-button
                   type="is-danger"
@@ -174,6 +180,7 @@
                   label="Remove Picture"
                   :loading="loading.delete"
                   style="margin-bottom: 30px; flex: 1"
+                  :disabled="picture.length == 0"
                   @click="removePicture"
                 ></b-button>
               </div>
@@ -200,12 +207,17 @@ export default {
       picture: "",
       loading: {
         save: false,
+        saveChanges: false,
         delete: false,
       },
       file: {},
       isCardModalActive: false,
       displayUpload: false,
       isLoading: true,
+      errors: {
+        surname: false,
+        title: false,
+      },
     };
   },
   async mounted() {
@@ -338,6 +350,33 @@ export default {
       this.files.splice(index, 1);
     },
     saveChanges() {
+      this.clearErrors();
+
+      let error = [];
+
+      if (this.surname === "") {
+        error.push("surname");
+      }
+
+      if (this.title === "") {
+        error.push("title");
+      }
+
+      if (error.length > 0) {
+        error.forEach((e) => {
+          this.errors[e] = true;
+        });
+
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: "Please make sure to fill in all the fields",
+          type: "is-danger",
+        });
+        return;
+      }
+
+      this.loading.saveChanges = true;
+
       axios
         .put("auth/profile", {
           title: this.title,
@@ -345,24 +384,36 @@ export default {
           grade: this.grade,
         })
         .then((response) => {
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: response.data.title,
-            type: "is-success",
-          });
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              duration: 2000,
+              message: response.data.title,
+              type: "is-success",
+            });
 
-          this.$store.commit("updateProfile", {
-            title: this.title,
-            surname: this.surname,
-          });
+            this.$store.commit("updateProfile", {
+              title: this.title,
+              surname: this.surname,
+            });
+
+            this.loading.saveChanges = false;
+          }, 300);
         })
         .catch((error) => {
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: error.response.data.title,
-            type: "is-danger",
-          });
+          setTimeout(() => {
+            this.$buefy.toast.open({
+              duration: 2000,
+              message: error.response.data.title,
+              type: "is-danger",
+            });
+
+            this.loading.saveChanges = false;
+          }, 300);
         });
+    },
+    clearErrors() {
+      this.errors.surname = false;
+      this.errors.title = false;
     },
     async getProfile() {
       await axios

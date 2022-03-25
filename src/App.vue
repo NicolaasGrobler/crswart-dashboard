@@ -14,6 +14,18 @@ export default {
 </script>
 
 <style lang="scss">
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.1s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
+}
+
 $scroll-background: #f5f5f5;
 $primary: #b89c6a;
 

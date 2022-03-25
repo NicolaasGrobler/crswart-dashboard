@@ -134,6 +134,7 @@
     <editor-content
       :editor="editor"
       class="editor"
+      :class="error ? 'is-danger' : ''"
       style="overflow-y: scroll"
     />
   </div>
@@ -161,6 +162,7 @@ export default {
       type: String,
       default: '',
     },
+    error: Boolean
   },
 
   watch: {
@@ -213,6 +215,10 @@ export default {
   border-radius: 5px;
   outline: 0px solid transparent;
   max-height: 300px;
+}
+
+.is-danger {
+  border-color: #640B26;
 }
 
 .ProseMirror:focus {

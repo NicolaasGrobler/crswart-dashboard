@@ -16,7 +16,7 @@
           readonly
         ></b-input>
       </b-field>
-      <b-field label="Grade">
+      <b-field label="Grade" :type="errors.grade ? 'is-danger':''">
         <b-select
           placeholder="Select a grade"
           expanded
@@ -32,7 +32,7 @@
           </option>
         </b-select>
       </b-field>
-      <b-field label="Subject">
+      <b-field label="Subject" :type="errors.subject && !subject_disabled ? 'is-danger':''">
         <b-select
           :placeholder="
             subject_loading ? 'Loading Subjects...' : 'Select a subject'
@@ -52,12 +52,12 @@
         </b-select>
       </b-field>
       <!-- Title -->
-      <b-field label="Lesson Title">
-        <b-input v-model="title"></b-input>
+      <b-field label="Lesson Title" :type="errors.title ? 'is-danger':''">
+        <b-input v-model="title" placeholder="Descriptive title. E.g. Lecture 1"></b-input>
       </b-field>
       <!-- Description -->
       <b-field label="Lesson Description">
-        <Tiptap v-model="description"></Tiptap>
+        <Tiptap v-model="description" :error="errors.description"></Tiptap>
       </b-field>
       <!-- File Upload -->
       <b-field label="Files">
@@ -138,10 +138,18 @@ export default {
       files: [],
       lesson_created: false,
       new_lesson_uuid: null,
+      errors: {
+        grade: false,
+        subject: false,
+        title: false,
+        description: false,
+      }
     };
   },
   methods: {
     async gradeChanged() {
+      this.subject = null;
+
       // Enable the subject select
       this.subject_disabled = true;
       // Set Loading State to true
@@ -157,8 +165,40 @@ export default {
         this.subject_disabled = false;
       }, 300);
     },
-
     async createLesson() {
+      this.clearErrors();
+      
+      let errors = [];
+
+      if (!this.grade) {
+        errors.push("grade");
+      }
+
+      if (!this.subject && !this.subject_disabled) {
+        errors.push("subject");
+      }
+
+      if (this.title == "" || this.title == null) {
+        errors.push("title");
+      }
+
+      if (this.description == "" || this.description == null || this.description == '<p></p>') {
+        errors.push("description");
+      }
+
+      if (errors.length > 0) {
+        errors.forEach((e) => {
+          this.errors[e] = true;
+        });
+
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: "Please make sure to fill in all the fields",
+          type: "is-danger",
+        });
+        return;
+      }
+
       if (this.files.length === 0) {
         this.$buefy.toast.open({
           duration: 2000,
@@ -282,6 +322,14 @@ export default {
       this.description = null;
       this.files = [];
       this.lesson_created = false;
+    },
+    clearErrors() {
+      this.errors = {
+        grade: false,
+        subject: false,
+        title: false,
+        description: false,
+      };
     },
   },
 };

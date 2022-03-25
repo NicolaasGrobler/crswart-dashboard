@@ -1,7 +1,9 @@
 <template>
   <section class="container">
-    <div class="tile is-vertical box" v-if="!lesson_edited">
-      <h1>Create Lesson</h1>
+    <div class="tile is-vertical box" style="position: relative" v-if="!lesson_edited">
+      <b-loading :is-full-page="false" v-model="isLoading"></b-loading>
+
+      <h1>Edit Lesson</h1>
       <b-field label="Author">
         <b-input
           icon="account"
@@ -16,7 +18,7 @@
           readonly
         ></b-input>
       </b-field>
-      <b-field label="Grade">
+      <b-field label="Grade" :type="errors.grade ? 'is-danger':''">
         <b-select
           placeholder="Select a grade"
           expanded
@@ -32,7 +34,7 @@
           </option>
         </b-select>
       </b-field>
-      <b-field label="Subject">
+      <b-field label="Subject" :type="errors.subject && !subject_disabled ? 'is-danger':''">
         <b-select
           placeholder="Select a subject"
           expanded
@@ -50,12 +52,12 @@
         </b-select>
       </b-field>
       <!-- Title -->
-      <b-field label="Lesson Title">
+      <b-field label="Lesson Title" :type="errors.title ? 'is-danger':''">
         <b-input v-model="title"></b-input>
       </b-field>
       <!-- Description -->
       <b-field label="Lesson Description">
-        <Tiptap v-model="description"></Tiptap>
+        <Tiptap v-model="description" :error="errors.description"></Tiptap>
       </b-field>
       <!-- Uploaded Files -->
       <b-field label="Uploaded Files">
@@ -161,6 +163,13 @@ export default {
       files: [],
       lesson_edited: false,
       new_lesson_uuid: null,
+      errors: {
+        grade: false,
+        subject: false,
+        title: false,
+        description: false,
+      },
+      isLoading: true
     };
   },
   mounted() {
@@ -168,7 +177,13 @@ export default {
   },
   methods: {
     async getLessonData() {
-      const response = await axios.get(`/lessons/${this.$route.params.uuid}`);
+      let response;
+      await axios.get(`/lessons/${this.$route.params.uuid}`).then(res => {
+        setTimeout(() => {
+          this.isLoading = false;
+          response = res;
+        }, 300);
+      });
       console.log(response.data);
       console.log(JSON.parse(response.data.lesson.files));
       this.grade = response.data.lesson.grade;
@@ -181,6 +196,8 @@ export default {
       this.uploadedFiles = JSON.parse(response.data.lesson.files);
     },
     async gradeChanged() {
+      this.subject = null;
+      
       // Set Loading State to true
       this.subject_loading = true;
       // Enable the subject select
@@ -197,6 +214,41 @@ export default {
       }, 300);
     },
     async editLesson() {
+      this.clearErrors();
+      
+      let errors = [];
+
+      if (!this.grade) {
+        errors.push("grade");
+      }
+
+      if (!this.subject && !this.subject_disabled) {
+        errors.push("subject");
+      }
+
+      if (this.title == "" || this.title == null) {
+        errors.push("title");
+      }
+
+      console.log(this.description)
+
+      if (this.description == "" || this.description == null || this.description == '<p></p>') {
+        errors.push("description");
+      }
+
+      if (errors.length > 0) {
+        errors.forEach((e) => {
+          this.errors[e] = true;
+        });
+
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: "Please make sure to fill in all the fields",
+          type: "is-danger",
+        });
+        return;
+      }
+
       if (this.files.length === 0 && this.uploadedFiles.length === 0) {
         this.$buefy.toast.open({
           duration: 2000,
@@ -319,6 +371,14 @@ export default {
     },
     reset() {
       this.$router.go(this.$router.currentRoute);
+    },
+    clearErrors() {
+      this.errors = {
+        grade: false,
+        subject: false,
+        title: false,
+        description: false,
+      };
     },
   },
 };

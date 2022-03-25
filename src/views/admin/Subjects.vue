@@ -2,11 +2,7 @@
   <section class="container" style="padding: 20px">
     <div class="tile is-ancestor box" style="margin-bottom: 30px">
       <!-- Add subject -->
-      <b-button
-        icon-left="plus"
-        type="is-primary"
-        @click="is_create_modal_active = true"
-      >
+      <b-button icon-left="plus" type="is-primary" @click="openCreateModal">
         Add Subject
       </b-button>
       <!-- Edit subject -->
@@ -142,7 +138,10 @@
           ></button>
         </header>
         <section class="modal-card-body">
-          <b-field label="Subject Name">
+          <b-field
+            label="Subject Name"
+            :type="errors.create.name ? 'is-danger' : ''"
+          >
             <b-input
               v-model="new_subject.name"
               placeholder="Enter subject name"
@@ -193,6 +192,14 @@
               </b-checkbox>
             </div>
           </b-field>
+          <transition name="fade" mode="out-in">
+            <p
+              v-show="errors.create.grades"
+              style="color: #640b26; font-weight: bold"
+            >
+              Please select a grade
+            </p>
+          </transition>
         </section>
         <footer class="modal-card-foot">
           <b-button
@@ -229,7 +236,10 @@
           ></button>
         </header>
         <section class="modal-card-body">
-          <b-field label="Subject Name">
+          <b-field
+            label="Subject Name"
+            :type="errors.edit.name ? 'is-danger' : ''"
+          >
             <b-input
               v-model="new_subject.name"
               placeholder="Enter subject name"
@@ -280,6 +290,14 @@
               </b-checkbox>
             </div>
           </b-field>
+          <transition name="fade" mode="out-in">
+            <p
+              v-show="errors.edit.grades"
+              style="color: #640b26; font-weight: bold"
+            >
+              Please select a grade
+            </p>
+          </transition>
         </section>
         <footer class="modal-card-foot">
           <b-button
@@ -327,6 +345,16 @@ export default {
       loading: {
         save_all: false,
         delete: false,
+      },
+      errors: {
+        create: {
+          name: false,
+          grades: false,
+        },
+        edit: {
+          name: false,
+          grades: false,
+        },
       },
     };
   },
@@ -383,6 +411,37 @@ export default {
       };
     },
     createSubject() {
+      this.clearErrors();
+
+      let errors = [];
+
+      if (this.new_subject.name === "") {
+        errors.push("name");
+      }
+
+      // if (
+      //   this.new_subject.grade_8 === false &&
+      //   this.new_subject.grade_9 === false &&
+      //   this.new_subject.grade_10 === false &&
+      //   this.new_subject.grade_11 === false &&
+      //   this.new_subject.grade_12 === false
+      // ) {
+      //   errors.push("grades");
+      // }
+
+      if (errors.length > 0) {
+        errors.forEach((e) => {
+          this.errors.create[e] = true;
+        });
+
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: "Please make sure to fill in all the fields",
+          type: "is-danger",
+        });
+        return;
+      }
+
       this.is_modal_create_loading = true;
 
       // Create the new subject
@@ -420,7 +479,13 @@ export default {
           }, 300);
         });
     },
+    openCreateModal() {
+      this.clearErrors();
+      this.is_create_modal_active = true;
+    },
     openEditModal() {
+      this.clearErrors();
+
       // Set subject data
       this.new_subject = {
         name: this.checked_rows[0].name,
@@ -435,6 +500,37 @@ export default {
       this.is_edit_modal_active = true;
     },
     editSubject() {
+      this.clearErrors();
+
+      let errors = [];
+
+      if (this.new_subject.name === "") {
+        errors.push("name");
+      }
+
+      // if (
+      //   this.new_subject.grade_8 === false &&
+      //   this.new_subject.grade_9 === false &&
+      //   this.new_subject.grade_10 === false &&
+      //   this.new_subject.grade_11 === false &&
+      //   this.new_subject.grade_12 === false
+      // ) {
+      //   errors.push("grades");
+      // }
+
+      if (errors.length > 0) {
+        errors.forEach((e) => {
+          this.errors.edit[e] = true;
+        });
+
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: "Please make sure to fill in all the fields",
+          type: "is-danger",
+        });
+        return;
+      }
+
       this.is_modal_edit_loading = true;
 
       // Update the subject
@@ -562,8 +658,25 @@ export default {
           this.data = [];
         });
     },
+    clearErrors() {
+      this.errors = {
+        create: {
+          name: false,
+          grades: false,
+        },
+        edit: {
+          name: false,
+          grades: false,
+        },
+      };
+    },
   },
 };
 </script>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+}
+</style>
